@@ -8,20 +8,11 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
-
 const upload = multer({ storage: multer.memoryStorage() });
-
-app.get('/', (req, res) => {
-  res.send('Hello from backend!');
-});
 
 app.post('/api/upload', upload.single('file'), async (req, res) => {
   try {
     const file = req.file;
-    if (!file) {
-      return res.status(400).json({ error: 'No file uploaded' });
-    }
-
     let text = '';
 
     if (file.mimetype === 'application/pdf') {
@@ -36,6 +27,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       );
       text = pageTexts.join('\n');
     } else {
+      // plain text file - just convert buffer directly 
       text = file.buffer.toString();
     }
 
@@ -48,3 +40,5 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+

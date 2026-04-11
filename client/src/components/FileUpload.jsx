@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function Upload() {
+export default function FileUpload() {
   const [file, setFile] = useState(null);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,50 +24,37 @@ function Upload() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="flex-1 flex items-center justify-center">
       <div className="bg-white shadow-md rounded-2xl p-6 w-full max-w-xl">
-        
         <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-          Upload Notes
+          Upload Study Material
         </h2>
 
         {/* File Input */}
         <label className="block border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-400 transition">
           <input
-            name = "file"
             type="file"
+            name = "file"
             className="hidden"
             onChange={(e) => setFile(e.target.files[0])}
           />
           <p className="text-gray-600">
-            {file ? file.name : "Click to upload PDF or text file"}
+            {file ? file.name : "Click to upload PDF or Text File"}
           </p>
         </label>
 
-        {/* Upload Button */}
+        {/* Generate Button */}
         <button
           onClick={handleUpload}
-          disabled={!file || loading}
+          disabled={!file}
           className="mt-4 w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-300"
         >
-          {loading ? "Uploading..." : "Upload"}
+          {loading ? "Generating..." : "Generate Practice Exam"}
         </button>
 
-        {/* Output */}
-        {text && (
-          <div className="mt-6">
-            <h3 className="text-lg font-medium mb-2 text-gray-700">
-              Extracted Text
-            </h3>
-            <div className="max-h-64 overflow-y-auto bg-gray-100 p-3 rounded-lg text-sm whitespace-pre-wrap">
-              {text}
-            </div>
-          </div>
-        )}
-
+        {/* Log Output for Debugging */}
+        {text && console.log(text)}
       </div>
     </div>
   );
 }
-
-export default Upload;
