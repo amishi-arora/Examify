@@ -10,27 +10,29 @@ app.use(cors());
 app.use(express.json());
 const upload = multer({ storage: multer.memoryStorage() });
 
-app.post('/api/upload', upload.single('file'), async (req, res) => {
+
+const extractText = async (file) => {
+  if (file.mimetype === 'application/pdf') {
+    const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(file.buffer) });
+    const pdfDoc = await loadingTask.promise;
+    const pageTexts = await Promise.all(
+      Array.from({ length: pdfDoc.numPages }, async (_, i) => {
+        const page = await pdfDoc.getPage(i + 1);
+        const content = await page.getTextContent();
+        return content.items.map(item => item.str).join(' ');
+      })
+    );
+    return pageTexts.join('\n');
+  } else {
+    return file.buffer.toString();
+  }
+};
+
+app.post('/api/upload', upload.array('files'), async (req, res) => {
   try {
-    const file = req.file;
-    let text = '';
-
-    if (file.mimetype === 'application/pdf') {
-      const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(file.buffer) });
-      const pdfDoc = await loadingTask.promise;
-      const pageTexts = await Promise.all(
-        Array.from({ length: pdfDoc.numPages }, async (_, i) => {
-          const page = await pdfDoc.getPage(i + 1);
-          const content = await page.getTextContent();
-          return content.items.map(item => item.str).join(' ');
-        })
-      );
-      text = pageTexts.join('\n');
-    } else {
-      // plain text file - just convert buffer directly 
-      text = file.buffer.toString();
-    }
-
+    const files = req.files;
+    let texts = await Promise.all(files.map(extractText));
+    const text = texts.join('\n\n');
     res.json({ text });
   } catch (err) {
     console.error(err);
