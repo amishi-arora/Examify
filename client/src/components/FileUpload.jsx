@@ -2,6 +2,7 @@ import { useState } from "react";
 
 export default function FileUpload() {
   const [files, setFiles] = useState([]);
+  const [generating, setGenerating] = useState(false); 
 
   const handleUpload = async () => {
     if (files.length === 0) return; 
@@ -9,13 +10,25 @@ export default function FileUpload() {
     const formData = new FormData();
     files.forEach(f => formData.append("files", f)); 
 
+    setGenerating(true); 
     const res = await fetch("http://localhost:3001/api/upload", {
       method: "POST",
-      body: formData,
+      body: formData
     });
 
     const data = await res.json();
-    console.log(data.text)
+
+    const resExam = await fetch("http://localhost:3001/api/generate-exam", {
+      method: "POST", 
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({text: data.text})
+    }); 
+
+    const examData = await resExam.json(); 
+    console.log(examData); 
+    setGenerating(false); 
   };
 
   function handleDelete(fileName) {
@@ -57,10 +70,10 @@ export default function FileUpload() {
         {/* Generate Button */}
         <button
           onClick={handleUpload}
-          disabled={files.length === 0}
+          disabled={files.length === 0 || generating === true}
           className="mt-4 w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-300"
         >
-          Generate Practice Exam
+          {generating? "Generating...": "Generate Practice Exam"}
         </button>
       </div>
     </div>
