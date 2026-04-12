@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function FileUpload() {
+export default function FileUpload({setQuestions}) {
   const [files, setFiles] = useState([]);
   const [generating, setGenerating] = useState(false); 
+
+  const navigate = useNavigate(); 
 
   const handleUpload = async () => {
     if (files.length === 0) return; 
@@ -27,8 +30,9 @@ export default function FileUpload() {
     }); 
 
     const examData = await resExam.json(); 
-    console.log(examData); 
+    setQuestions(examData); 
     setGenerating(false); 
+    navigate("/exam"); 
   };
 
   function handleDelete(fileName) {
