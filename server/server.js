@@ -59,15 +59,15 @@ Return ONLY a JSON object in this exact format, no markdown, no backticks, no ex
   "questions": [
     {
       "id": 1,
-      "type": "mc",
-      "question": "question here",
+      "type": "Multiple choice",
+      "questionTitle": "question here",
       "options": ["A. option1", "B. option2", "C. option3", "D. option4"],
       "answer": "A. option1"
     },
     {
       "id": 6,
-      "type": "short",
-      "question": "question here",
+      "type": "Short answer",
+      "questionTitle": "question here",
       "answer": "sample correct answer here"
     }
   ]
