@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Header from "./components/Header";
-import FileUpload from "./components/FileUpload";
-import Exam from "./components/Exam";
+import HomePage from "./pages/HomePage";
+import ExamPage from "./pages/ExamPage";
 
 function App() {
   const [questions, setQuestions] = useState(null);
@@ -12,13 +11,10 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={
-          <div className="flex flex-col min-h-screen bg-stone-50 p-15">
-            <Header title="AI Powered Exam Generator" subtitle="Study for your next exam with ease" />
-            <FileUpload setQuestions={setQuestions} />
-          </div>
+          <HomePage setQuestions={setQuestions} />
         } />
         <Route path="/exam" element={
-          <Exam examQuestions={questions} />
+          <ExamPage examQuestions={questions} />
         } />
       </Routes>
     </BrowserRouter>
