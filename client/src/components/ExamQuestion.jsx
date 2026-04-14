@@ -9,7 +9,7 @@ export default function ExamQuestion({ question }) {
         <p className="font-bold">{question.questionTitle}</p>
 
         {question.type === "Multiple choice" ? <form className="flex flex-col gap-3">
-            {question.options.map((o, i) => <MultipleChoiceOption key={i} option={o} id={i} />)}
+            {question.options.map((o, i) => <MultipleChoiceOption key={i} index = {i} option={o} id={question.id} />)}
         </form> :
             <textarea placeholder="Type your answer here" className="border-1 border-mist-300 p-2 rounded-lg bg-mist-100" ></textarea>
         }
