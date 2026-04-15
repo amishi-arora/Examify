@@ -7,7 +7,7 @@ export default function FileUpload({setQuestions}) {
 
   const navigate = useNavigate(); 
 
-  const handleUpload = async () => {
+  async function handleUpload() {
     if (files.length === 0) return; 
 
     const formData = new FormData();

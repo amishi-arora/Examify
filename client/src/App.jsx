@@ -4,9 +4,8 @@ import HomePage from "./pages/HomePage";
 import ExamPage from "./pages/ExamPage";
 
 function App() {
-  const [questions, setQuestions] = useState(null);
-  console.log(questions);
-
+  const [questions, setQuestions] = useState({questions: []});
+  
   return (
     <BrowserRouter>
       <Routes>
