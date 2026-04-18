@@ -8,7 +8,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite-preview' });
+const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -70,11 +70,18 @@ app.post('/api/grade-exam', async (req, res) => {
     const answers = req.body.answers;
 
     for (const q of questions.questions) {
-      if (q.type === "Multiple choice") {
-        answers[q.id] === q.answer ? results[q.id] = { score: 1, answer: q.answer } : results[q.id] = { score: 0, answer: q.answer }
+      if (!answers[q.id]) {
+        results[q.id] = { score: 0, feedback: 'No answer provided', answer: q.answer };
+      }
+      else if (q.type === "Multiple choice") {
+        results[q.id] = {
+          score: answers[q.id] === q.answer ? 1 : 0,
+          answer: q.answer
+        }
       } else {
         const result = await model.generateContent(prompts.gradeExam(q.questionTitle, answers[q.id], q.answer));
         results[q.id] = JSON.parse(result.response.text());
+        results[q.id].answer = q.answer; 
       }
     }
     res.json(results);
@@ -86,7 +93,3 @@ app.post('/api/grade-exam', async (req, res) => {
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-
-// result.response.text()?
-// inserting key in object 

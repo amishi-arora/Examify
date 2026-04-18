@@ -1,24 +1,23 @@
-import { useState } from "react"
+import { useNavigate } from "react-router-dom";
 import ExamQuestion from "../components/ExamQuestion"
 import Header from "../components/Header"
-export default function ExamPage({ examQuestions }) {
-    const [answers, updateAnswers] = useState({});
-
+export default function ExamPage({ answers, examQuestions, updateAnswers, updateResults }) {
+    const navigate = useNavigate();
     function setAnswers(question, answer) {
         updateAnswers(prev => ({ ...prev, [question]: answer }));
     }
-
     async function handleSubmit() {
         const res = await fetch("http://localhost:3001/api/grade-exam", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({answers, examQuestions})
+            body: JSON.stringify({ answers, examQuestions })
         });
 
         const results = await res.json();
-        console.log(results); 
+        updateResults(results);
+        navigate("/results");
     }
 
     return <main className="flex flex-col items-center min-h-screen bg-stone-50 p-15 gap-10">

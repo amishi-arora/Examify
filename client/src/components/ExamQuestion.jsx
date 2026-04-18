@@ -10,7 +10,7 @@ export default function ExamQuestion({ question, onAnswer }) {
 
         {question.type === "Multiple choice" ? <div className="flex flex-col gap-3">
             {question.options.map((o, i) => {
-                return <MultipleChoiceOption key={i} index = {i} option={o} id={question.id} onSelect = {() => onAnswer(question.id, o)} />})}
+                return <MultipleChoiceOption key={i} isDisabled = {false} index = {i} option={o} id={question.id} onSelect = {() => onAnswer(question.id, o)} />})}
         </div> :
             <textarea onChange = {(e) => onAnswer(question.id, e.target.value)} placeholder="Type your answer here" className="border-1 border-mist-300 p-2 rounded-lg bg-mist-100" ></textarea>
         }
