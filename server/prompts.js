@@ -22,12 +22,12 @@ Study material:
 ${text}`
 
 
-export const gradeExam = (question, answer, sampleAnswer) => `You are an exam grader grading a short answer question
-        question: ${question} students answer: ${answer} sampleCorrectAnswer: ${sampleAnswer}
+export const gradeExam = (question, studentAnswer, sampleCorrectAnswer) => `You are an exam grader grading a short answer question
+        question: ${question} students answer: ${studentAnswer} sampleCorrectAnswer: ${sampleCorrectAnswer}
         
         Grade the students answer based on the question and sample answer and return ONLY a JSON object in this exact format, no markdown, no backticks, no explanation:
         {"score": 0 | 0.5 | 1,
-        "feedback": "brief explanation of why this score was given, only 1-2 lines.}
+        "feedback": brief explanation of why this score was given, only 1-2 lines.}
         Scoring criteria: 
         1: Student's answer is correct and demonstrates clear understanding. The students answer does NOT need to match the sample answer exactly. 
         0.5 Student's answer is partially correct or shows some understanding but is missing key details

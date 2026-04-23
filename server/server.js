@@ -7,13 +7,17 @@ import * as prompts from "./prompts.js";
 import { GoogleGenerativeAI } from '@google/generative-ai';
 dotenv.config();
 
+// --- AI Setup --- 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+// --- Middleware ---
 const app = express();
 app.use(cors());
 app.use(express.json());
-const upload = multer({ storage: multer.memoryStorage() });
 
+// --- File Upload & Text Extraction --- 
+const upload = multer({ storage: multer.memoryStorage() });
 
 const extractText = async (file) => {
   if (file.mimetype === 'application/pdf') {
@@ -28,10 +32,12 @@ const extractText = async (file) => {
     );
     return pageTexts.join();
   } else {
+    // plain text file - just convert bffer directly 
     return file.buffer.toString();
   }
 };
 
+// --- Routes -- 
 app.post('/api/upload', upload.array('files'), async (req, res) => {
   try {
     const files = req.files;
@@ -66,22 +72,22 @@ app.post('/api/generate-exam', async (req, res) => {
 app.post('/api/grade-exam', async (req, res) => {
   try {
     const results = {};
-    const questions = req.body.examQuestions;
-    const answers = req.body.answers;
+    const examQuestions = req.body.examQuestions;
+    const studentAnswers = req.body.studentAnswers;
 
-    for (const q of questions.questions) {
-      if (!answers[q.id]) {
-        results[q.id] = { score: 0, feedback: 'No answer provided', answer: q.answer };
+    for (const q of examQuestions.questions) {
+      if (!studentAnswers[q.id]) {
+        results[q.id] = { score: 0, feedback: 'No answer provided', correctAnswer: q.answer };
       }
       else if (q.type === "Multiple choice") {
         results[q.id] = {
-          score: answers[q.id] === q.answer ? 1 : 0,
-          answer: q.answer
+          score: studentAnswers[q.id] === q.answer ? 1 : 0,
+          correctAnswer: q.answer
         }
       } else {
-        const result = await model.generateContent(prompts.gradeExam(q.questionTitle, answers[q.id], q.answer));
+        const result = await model.generateContent(prompts.gradeExam(q.questionTitle, studentAnswers[q.id], q.answer));
         results[q.id] = JSON.parse(result.response.text());
-        results[q.id].answer = q.answer; 
+        results[q.id].correctAnswer = q.answer;
       }
     }
     res.json(results);
@@ -89,7 +95,9 @@ app.post('/api/grade-exam', async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Failed to grade exam' });
   }
-})
+});
 
+// --- Start Server ---
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+

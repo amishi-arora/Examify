@@ -5,18 +5,18 @@ import ExamPage from "./pages/ExamPage";
 import ExamResultsPage from "./pages/ExamResultsPage";
 
 function App() {
-  const [questions, setQuestions] = useState({ questions: [] });
-  const [examAnswers, setExamAnswers] = useState({}); 
-  const [examResults, setExamResults] = useState({}); 
+  const [questions, setExamQuestions] = useState(null);
+  const [examAnswers, setExamAnswers] = useState(null); 
+  const [examResults, setExamResults] = useState(null) 
 
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={
-          <HomePage setQuestions={setQuestions} />
+          <HomePage setExamQuestions={setExamQuestions} />
         } />
         <Route path="/exam" element={
-          <ExamPage answers = {examAnswers} updateAnswers = {setExamAnswers} updateResults = {setExamResults} examQuestions={questions} />
+          <ExamPage studentAnswers = {examAnswers} examQuestions={questions}  setExamAnswers = {setExamAnswers} setExamResults = {setExamResults}/>
         } />
         <Route path="/results" element={
           <ExamResultsPage examQuestions={questions} examAnswers = {examAnswers} examResults={examResults}/>
