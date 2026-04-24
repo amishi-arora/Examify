@@ -81,7 +81,7 @@ export default function FileUpload({ setExamQuestions }) {
         <button
           onClick={handleUpload}
           disabled={files.length === 0 || generating}
-          className="mt-4 w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-300">
+          className="cursor-pointer mt-4 w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-300 disabled:cursor-default">
           {generating ? "Generating..." : "Generate Practice Exam"}
         </button>
 
