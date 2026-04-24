@@ -6,14 +6,14 @@ Return ONLY a JSON object in this exact format, no markdown, no backticks, no ex
     {
       "id": 1,
       "type": "Multiple choice",
-      "questionTitle": "question here",
+      "questionText": "question here",
       "options": ["A. option1", "B. option2", "C. option3", "D. option4"],
       "answer": "A. option1"
     },
     {
       "id": 4,
       "type": "Short answer",
-      "questionTitle": "question here",
+      "questionText": "question here",
       "answer": "brief sample correct answer here, only 1-2 lines"
     }
   ]

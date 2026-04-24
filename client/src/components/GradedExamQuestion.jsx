@@ -19,14 +19,14 @@ export default function GradedExamQuestion({ question, studentAnswer, result }) 
             <span className={`text-xs p-1 w-fit rounded-xl transition duration-150 ease hover:scale-102 ${tagColor}`}>{tag}</span>
             <span className={`${getScoreColor(result.score)} text-xs p-2 border-1 rounded-xl ease hover:scale-102`}>{`${result.score}/1`}</span>
         </div>
-        <p className="font-bold">{question.questionTitle}</p>
+        <p className="font-bold">{question.questionText}</p>
 
         {question.type === "Multiple choice" ?
             <div className="flex flex-col gap-3">
                 {question.options.map((o, i) =>
                     <MultipleChoiceOption key={i} isDisabled={true} index={i} option={o} id={question.id} isSelected={o === studentAnswer} isCorrectAnswer={o === result.correctAnswer} />
                 )}
-                {/* Only show correct answer if student got it wrong  */}
+                {/* Only show correct multiple choice answer if student got it wrong  */}
                 {result.score === 0 &&
                     <div className="border p-2 rounded-lg border-green-600 bg-green-50 text-green-900 ease">
                         <p className="text-xs font-semibold">Correct Answer:</p>

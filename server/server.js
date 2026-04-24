@@ -85,7 +85,7 @@ app.post('/api/grade-exam', async (req, res) => {
           correctAnswer: q.answer
         }
       } else {
-        const result = await model.generateContent(prompts.gradeExam(q.questionTitle, studentAnswers[q.id], q.answer));
+        const result = await model.generateContent(prompts.gradeExam(q.questionText, studentAnswers[q.id], q.answer));
         results[q.id] = JSON.parse(result.response.text());
         results[q.id].correctAnswer = q.answer;
       }
