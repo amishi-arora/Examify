@@ -30,9 +30,9 @@ const extractText = async (file) => {
         return content.items.map(item => item.str).join(' ');
       })
     );
-    return pageTexts.join();
+    return pageTexts.join('\n');
   } else {
-    // plain text file - just convert bffer directly 
+    // plain text file - just convert buffer directly 
     return file.buffer.toString();
   }
 };
@@ -42,14 +42,13 @@ app.post('/api/upload', upload.array('files'), async (req, res) => {
   try {
     const files = req.files;
     let texts = await Promise.all(files.map(extractText));
-    const text = texts.join();
+    const text = texts.join('\n\n');
     res.json({ text });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to process file' });
   }
 });
-
 
 app.post('/api/generate-exam', async (req, res) => {
   try {
