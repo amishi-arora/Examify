@@ -1,40 +1,20 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { uploadFiles, generateExam } from "../api.js";
 
 export default function FileUpload({ setExamQuestions }) {
   const navigate = useNavigate();
   const [files, setFiles] = useState([]);
   const [generating, setGenerating] = useState(false);
 
-  async function uploadFiles() {
-    const formData = new FormData();
-    files.forEach(f => formData.append("files", f));
-    const res = await fetch("http://localhost:3001/api/upload", {
-      method: "POST",
-      body: formData
-    });
-    return res.json();
-  }
-
-  async function generateExam(text) {
-    const res = await fetch("http://localhost:3001/api/generate-exam", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ text })
-    });
-    return res.json();
-  }
-
   async function handleUpload() {
     if (files.length === 0) return;
     setGenerating(true);
-    const { text } = await uploadFiles();
+    const { text } = await uploadFiles(files);
     const examData = await generateExam(text);
     setExamQuestions(examData);
-    navigate("/exam");
     setGenerating(false);
+    navigate("/exam");
   };
 
   function handleDelete(fileName) {

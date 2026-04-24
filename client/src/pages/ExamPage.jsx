@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { gradeExam } from "../api.js";
 import ExamQuestion from "../components/ExamQuestion"
 import Header from "../components/Header"
 
@@ -9,14 +10,7 @@ export default function ExamPage({ studentAnswers, examQuestions, setExamAnswers
 
     async function handleSubmit() {
         setGrading(true);
-        const res = await fetch("http://localhost:3001/api/grade-exam", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ studentAnswers, examQuestions })
-        });
-        const results = await res.json();
+        const results = await gradeExam(studentAnswers, examQuestions); 
         setExamResults(results);
         setGrading(false);
         navigate("/results");
