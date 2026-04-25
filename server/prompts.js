@@ -1,4 +1,4 @@
-export const generateExam = (text) => `You are an exam generator. Based on the following study material, generate an exam with exactly 3 multiple choice questions and 2 short answer questions.
+export const generateExam = (text) => `You are an exam generator. Based on the following study material, generate an exam with exactly 5 multiple choice questions and 5 short answer questions.
 
 Return ONLY a JSON object in this exact format, no markdown, no backticks, no explanation:
 {
@@ -21,14 +21,22 @@ Return ONLY a JSON object in this exact format, no markdown, no backticks, no ex
 Study material:
 ${text}`
 
+export const gradeShortAnswers = (questions, studentAnswers) => `You are an exam grader.
 
-export const gradeExam = (question, studentAnswer, sampleCorrectAnswer) => `You are an exam grader grading a short answer question
-        question: ${question} students answer: ${studentAnswer} sampleCorrectAnswer: ${sampleCorrectAnswer}
-        
-        Grade the students answer based on the question and sample answer and return ONLY a JSON object in this exact format, no markdown, no backticks, no explanation:
-        {"score": 0 | 0.5 | 1,
-        "feedback": brief explanation of why this score was given, only 1-2 lines.}
-        Scoring criteria: 
-        1: Student's answer is correct and demonstrates clear understanding. The students answer does NOT need to match the sample answer exactly. 
-        0.5 Student's answer is partially correct or shows some understanding but is missing key details
-        0: Students answer is incorrect, irrelevant, or blank`
+    Grade each of the following short answer questions and return ONLY a JSON array in this exact format, no markdown, no backticks, no explanation:
+    [
+      {"id": 1, "score": 0 | 0.5 | 1, "feedback": "brief explanation, 1-2 lines."}
+    ]
+
+    Questions:
+    ${questions.map(q => `
+    ID: ${q.id}
+    Question: ${q.questionText}
+    Student's answer: ${studentAnswers[q.id] || "No answer provided"}
+    Sample answer: ${q.answer}
+    `).join('\n')}
+
+    Scoring criteria:
+    1: Correct and demonstrates clear understanding. Does not need to match sample answer exactly.
+    0.5: Partially correct, missing key details.
+    0: Incorrect, irrelevant, or blank`

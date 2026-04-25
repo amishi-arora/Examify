@@ -9,7 +9,7 @@ dotenv.config();
 
 // --- AI Setup --- 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
 // --- Middleware ---
 const app = express();
@@ -71,25 +71,32 @@ app.post('/api/generate-exam', async (req, res) => {
 app.post('/api/grade-exam', async (req, res) => {
   try {
     const results = {};
-    const examQuestions = req.body.examQuestions;
-    const studentAnswers = req.body.studentAnswers;
+    const { examQuestions, studentAnswers } = req.body;
+    const mcQuestions = examQuestions.questions.filter(q => q.type === "Multiple choice");
+    const shortQuestions = examQuestions.questions.filter(q => q.type === "Short answer");
 
-    for (const q of examQuestions.questions) {
-      if (!studentAnswers[q.id]) {
-        results[q.id] = { score: 0, feedback: 'No answer provided', correctAnswer: q.answer };
-      }
-      else if (q.type === "Multiple choice") {
-        results[q.id] = {
-          score: studentAnswers[q.id] === q.answer ? 1 : 0,
-          correctAnswer: q.answer
-        }
-      } else {
-        const result = await model.generateContent(prompts.gradeExam(q.questionText, studentAnswers[q.id], q.answer));
-        const raw = result.response.text().replace(/```json\n?|```/g, '').trim();
-        results[q.id] = JSON.parse(raw);
-        results[q.id].correctAnswer = q.answer;
-      }
+    // Grade MC locally
+    for (const q of mcQuestions) {
+      results[q.id] = {
+        score: studentAnswers[q.id] === q.answer ? 1 : 0,
+        correctAnswer: q.answer
+      };
     }
+
+    // Grade all short answers in one AI call
+    if (shortQuestions.length > 0) {
+      const result = await model.generateContent(prompts.gradeShortAnswers(shortQuestions, studentAnswers));
+      const raw = result.response.text().replace(/```json\n?|```/g, '').trim();
+      const parsed = JSON.parse(raw);
+      parsed.forEach(r => {
+        results[r.id] = {
+          score: r.score,
+          feedback: r.feedback,
+          correctAnswer: shortQuestions.find(q => q.id === r.id).answer
+        };
+      });
+    }
+
     res.json(results);
   } catch (err) {
     console.error(err);

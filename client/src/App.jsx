@@ -6,8 +6,8 @@ import ExamResultsPage from "./pages/ExamResultsPage";
 
 function App() {
   const [questions, setExamQuestions] = useState(null);
-  const [examAnswers, setExamAnswers] = useState(null);
-  const [examResults, setExamResults] = useState(null)
+  const [examAnswers, setExamAnswers] = useState({});
+  const [examResults, setExamResults] = useState({})
 
   return (
     <BrowserRouter>
