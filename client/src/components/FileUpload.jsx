@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { uploadFiles, generateExam } from "../api.js";
+import ErrorMessage from "./ErrorMessage.jsx";
 
 export default function FileUpload({ setExamQuestions }) {
   const navigate = useNavigate();
@@ -16,11 +17,10 @@ export default function FileUpload({ setExamQuestions }) {
       const { text } = await uploadFiles(files);
       const examData = await generateExam(text);
       setExamQuestions(examData);
-      setGenerating(false);
       navigate("/exam");
     } catch (err) {
       console.log(err);
-      setError("Something went wrong. Please try again.");
+      setError("Failed to generate exam. Please try again.");
     } finally {
       setGenerating(false);
     }
@@ -75,8 +75,7 @@ export default function FileUpload({ setExamQuestions }) {
         </button>
 
         {/* Error message in case exam generation fails */}
-        {error && <p className="text-red-500 text-sm mt-2 text-center">{error}</p>}
-
+        {error && <ErrorMessage message = {error}/>}
       </div>
     </div>
   );

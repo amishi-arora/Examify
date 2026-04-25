@@ -3,24 +3,24 @@ import { useNavigate } from "react-router-dom";
 import { gradeExam } from "../api.js";
 import ExamQuestion from "../components/ExamQuestion"
 import Header from "../components/Header"
+import ErrorMessage from "../components/ErrorMessage.jsx";
 
 export default function ExamPage({ studentAnswers, examQuestions, setExamAnswers, setExamResults }) {
     const navigate = useNavigate();
     const [grading, setGrading] = useState(false);
-    const [error, setError] = useState(null); 
+    const [error, setError] = useState(null);
 
     async function handleSubmit() {
         setGrading(true);
         try {
             const results = await gradeExam(studentAnswers, examQuestions);
             setExamResults(results);
-            setGrading(false);
             navigate("/results");
         } catch (err) {
-            console.log(err); 
-            setError("Something went wrong. Please try again.");
+            console.log(err);
+            setError("Failed to grade exam. Please try again.");
         } finally {
-            setGrading(false); 
+            setGrading(false);
         }
 
     }
@@ -37,6 +37,6 @@ export default function ExamPage({ studentAnswers, examQuestions, setExamAnswers
         </button>
 
         {/* Error message in case exam grading fails */}
-        {error && <p className="text-red-500 text-sm mt-2 text-center">{error}</p>}
+        {error && <ErrorMessage message={error} />}
     </main>
 }

@@ -17,7 +17,7 @@ export async function generateExam(text) {
         },
         body: JSON.stringify({ text })
     });
-    if (!res.ok) throw new Error("Failed to  generate exam"); 
+    if (!res.ok) throw new Error("Failed to generate exam,"); 
     return res.json();
 }
 
@@ -29,6 +29,6 @@ export async function gradeExam(studentAnswers, examQuestions) {
         },
         body: JSON.stringify({ studentAnswers, examQuestions })
     });
-    if (!res.ok) throw new Error("Failed to grade exam"); 
+    if (!res.ok) throw new Error("Failed to grade exam."); 
     return res.json();
 }
