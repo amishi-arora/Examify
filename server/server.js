@@ -58,7 +58,7 @@ app.post('/api/generate-exam', async (req, res) => {
       return res.status(400).json({ error: 'No study material text provided' });
     }
     const result = await model.generateContent(prompts.generateExam(text));
-    const raw = result.response.text();
+    const raw = result.response.text().replace(/```json\n?|```/g, '').trim();
     const exam = JSON.parse(raw);
 
     res.json(exam);
@@ -85,7 +85,8 @@ app.post('/api/grade-exam', async (req, res) => {
         }
       } else {
         const result = await model.generateContent(prompts.gradeExam(q.questionText, studentAnswers[q.id], q.answer));
-        results[q.id] = JSON.parse(result.response.text());
+        const raw = result.response.text().replace(/```json\n?|```/g, '').trim();
+        results[q.id] = JSON.parse(raw);
         results[q.id].correctAnswer = q.answer;
       }
     }

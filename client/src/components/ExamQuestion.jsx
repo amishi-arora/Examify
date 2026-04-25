@@ -8,6 +8,7 @@ export default function ExamQuestion({ question, handleAnswer }) {
         <span className={`text-xs p-1 w-fit rounded-xl transition duration-150 ease hover:scale-102 ${tagColor}`}>{tag}</span>
         <p className="font-bold">{question.questionText}</p>
 
+        {/* Multiple choice options for MCQ's. Text area for short answer Q's*/}
         {question.type === "Multiple choice" ? <div className="flex flex-col gap-3">
             {question.options.map((o, i) => 
                 <MultipleChoiceOption key={i} index={i} id={question.id} option={o} handleAnswer={() => handleAnswer(question.id, o)} />

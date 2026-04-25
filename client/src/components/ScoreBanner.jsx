@@ -1,11 +1,11 @@
+function getScoreFeedback(ratio) {
+    if (ratio <= 0.45) return { feedback: "Keep going! Take some time to review the material and try again", colour: "text-red-900" };
+    else if (ratio <= 0.65) return { feedback: "Good effort! There are some topics worth reviewing.", colour: "text-amber-800" };
+    else return { feedback: "Great work! You have a solid understanding of the material!", colour: "text-green-900" }
+}
+
 export default function ScoreBanner({ score, total }) {
     const ratio = score / total;
-    function getScoreFeedback(ratio) {
-        if (ratio <= 0.45) return { feedback: "Keep going! Take some time to review the material and try again", colour: "text-red-900" };
-        else if (ratio <= 0.65) return { feedback: "Good effort! There are some topics worth reviewing.", colour: "text-amber-800" };
-        else return { feedback: "Great work! You have a solid understanding of the material!", colour: "text-green-900" }
-    }
-
     const { feedback, colour } = getScoreFeedback(ratio);
 
     return (
