@@ -6,15 +6,24 @@ export default function FileUpload({ setExamQuestions }) {
   const navigate = useNavigate();
   const [files, setFiles] = useState([]);
   const [generating, setGenerating] = useState(false);
+  const [error, setError] = useState(null);
 
-  async function handleUpload() {
+  async function handleGenerate() {
     if (files.length === 0) return;
     setGenerating(true);
-    const { text } = await uploadFiles(files);
-    const examData = await generateExam(text);
-    setExamQuestions(examData);
-    setGenerating(false);
-    navigate("/exam");
+    setError(null);
+    try {
+      const { text } = await uploadFiles(files);
+      const examData = await generateExam(text);
+      setExamQuestions(examData);
+      setGenerating(false);
+      navigate("/exam");
+    } catch (err) {
+      console.log(err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setGenerating(false);
+    }
   };
 
   function handleDelete(fileName) {
@@ -59,11 +68,14 @@ export default function FileUpload({ setExamQuestions }) {
 
         {/* Generate Button */}
         <button
-          onClick={handleUpload}
+          onClick={handleGenerate}
           disabled={files.length === 0 || generating}
           className="cursor-pointer mt-4 w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-300 disabled:cursor-default">
           {generating ? "Generating..." : "Generate Practice Exam"}
         </button>
+
+        {/* Error message in case exam generation fails */}
+        {error && <p className="text-red-500 text-sm mt-2 text-center">{error}</p>}
 
       </div>
     </div>

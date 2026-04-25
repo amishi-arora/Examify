@@ -26,6 +26,7 @@ export default function GradedExamQuestion({ question, studentAnswer, result }) 
                 {question.options.map((o, i) =>
                     <MultipleChoiceOption key={i} isDisabled={true} index={i} option={o} id={question.id} isSelected={o === studentAnswer} isCorrectAnswer={o === result.correctAnswer} />
                 )}
+                
                 {/* Only show correct multiple choice answer if student got it wrong  */}
                 {result.score === 0 &&
                     <div className="border p-2 rounded-lg border-green-600 bg-green-50 text-green-900 ease">
@@ -37,12 +38,14 @@ export default function GradedExamQuestion({ question, studentAnswer, result }) 
             <>
                 {/* Student's submitted short answer */}
                 <textarea value={studentAnswer || ""} disabled className="border-1 border-mist-300 p-2 rounded-lg bg-mist-100" ></textarea>
+
                 {/* Only show sample answer if student didn't get full marks */}
                 {result.score !== 1 &&
                     <div className="border p-2 rounded-lg border-green-600 bg-green-50 text-green-900 ease">
                         <p className="text-xs font-semibold">Sample answer:</p>
                         <p className="text-sm">{result.correctAnswer}</p>
                     </div>}
+
                 {/* AI Generated feedback about the student answer */}
                 <div className={`border p-2 rounded-lg ${getScoreColor(result.score)}`}>
                     <p className="text-xs font-semibold">Feedback:</p>

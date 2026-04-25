@@ -6,8 +6,8 @@ import ExamResultsPage from "./pages/ExamResultsPage";
 
 function App() {
   const [questions, setExamQuestions] = useState(null);
-  const [examAnswers, setExamAnswers] = useState(null); 
-  const [examResults, setExamResults] = useState(null) 
+  const [examAnswers, setExamAnswers] = useState(null);
+  const [examResults, setExamResults] = useState(null)
 
   return (
     <BrowserRouter>
@@ -15,11 +15,13 @@ function App() {
         <Route path="/" element={
           <HomePage setExamQuestions={setExamQuestions} />
         } />
-        <Route path="/exam" element={
-          <ExamPage studentAnswers = {examAnswers} examQuestions={questions}  setExamAnswers = {setExamAnswers} setExamResults = {setExamResults}/>
+        <Route path="/exam" element={questions ?
+          <ExamPage studentAnswers={examAnswers} examQuestions={questions} setExamAnswers={setExamAnswers} setExamResults={setExamResults} /> :
+          <Navigate to="/" />
         } />
-        <Route path="/results" element={
-          <ExamResultsPage examQuestions={questions} examAnswers = {examAnswers} examResults={examResults}/>
+        <Route path="/results" element={examResults ?
+          <ExamResultsPage examQuestions={questions} examAnswers={examAnswers} examResults={examResults} /> :
+          <Navigate to="/" />
         } />
       </Routes>
     </BrowserRouter>

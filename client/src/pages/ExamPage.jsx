@@ -7,13 +7,22 @@ import Header from "../components/Header"
 export default function ExamPage({ studentAnswers, examQuestions, setExamAnswers, setExamResults }) {
     const navigate = useNavigate();
     const [grading, setGrading] = useState(false);
+    const [error, setError] = useState(null); 
 
     async function handleSubmit() {
         setGrading(true);
-        const results = await gradeExam(studentAnswers, examQuestions); 
-        setExamResults(results);
-        setGrading(false);
-        navigate("/results");
+        try {
+            const results = await gradeExam(studentAnswers, examQuestions);
+            setExamResults(results);
+            setGrading(false);
+            navigate("/results");
+        } catch (err) {
+            console.log(err); 
+            setError("Something went wrong. Please try again.");
+        } finally {
+            setGrading(false); 
+        }
+
     }
 
     function handleAnswer(question, answer) {
@@ -22,9 +31,12 @@ export default function ExamPage({ studentAnswers, examQuestions, setExamAnswers
 
     return <main className="flex flex-col items-center min-h-screen bg-stone-50 p-15 gap-10">
         <Header title="Practice Exam" />
-        {examQuestions.questions.map((q, i) => <ExamQuestion key={i} question={q} handleAnswer={handleAnswer}/>)}
+        {examQuestions.questions.map((q, i) => <ExamQuestion key={i} question={q} handleAnswer={handleAnswer} />)}
         <button disabled={grading} onClick={handleSubmit} className="cursor-pointer bg-blue-500 text-white py-3 px-9 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-300 disabled:cursor-default">
             {grading ? "Grading..." : "Submit Exam"}
         </button>
+
+        {/* Error message in case exam grading fails */}
+        {error && <p className="text-red-500 text-sm mt-2 text-center">{error}</p>}
     </main>
 }
