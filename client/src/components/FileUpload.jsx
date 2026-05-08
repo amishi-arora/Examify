@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { uploadFiles, generateExam } from "../api.js";
 import ErrorMessage from "./ErrorMessage.jsx";
+import ExamSettings from "./ExamSettings.jsx";
 
 export default function FileUpload({ setExamQuestions }) {
   const navigate = useNavigate();
@@ -77,6 +78,8 @@ export default function FileUpload({ setExamQuestions }) {
 
         {/* Error message in case exam generation fails */}
         {error && <ErrorMessage message={error} />}
+
+        <ExamSettings></ExamSettings>
       </div>
     </div>
   );
