@@ -45,6 +45,7 @@ export default function FileUpload({ setExamQuestions }) {
         {/* File Input */}
         <label className="block border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-400 transition">
           <input
+            key={files.length}
             type="file"
             name="files"
             accept=".pdf, .txt"
@@ -75,7 +76,7 @@ export default function FileUpload({ setExamQuestions }) {
         </button>
 
         {/* Error message in case exam generation fails */}
-        {error && <ErrorMessage message = {error}/>}
+        {error && <ErrorMessage message={error} />}
       </div>
     </div>
   );

@@ -25,7 +25,7 @@ export const gradeShortAnswers = (questions, studentAnswers) => `You are an exam
 
     Grade each of the following short answer questions and return ONLY a JSON array in this exact format, no markdown, no backticks, no explanation:
     [
-      {"id": 1, "score": 0 | 0.5 | 1, "feedback": "brief explanation, 1-2 lines."}
+      {"id": 1, "score": 0 | 0.5 | 1, "feedback": "brief explanation, 1-2 lines. If no answer was provided, return, 'No answer was provided'"}
     ]
 
     Questions:
