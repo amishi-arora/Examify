@@ -9,6 +9,17 @@ export default function FileUpload({ setExamQuestions }) {
   const [files, setFiles] = useState([]);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState(null);
+  const [examSettings, setSettings] = useState({
+    difficulty: "medium",
+    multipleChoice: 5,
+    shortAnswer: 5,
+    focusTopics: "",
+    additionalInstructions: ""
+  });
+
+  function updateSettings(setting, value) {
+    setSettings(prev => ({ ...prev, [setting]: value }));
+  }
 
   async function handleGenerate() {
     if (files.length === 0) return;
@@ -16,7 +27,7 @@ export default function FileUpload({ setExamQuestions }) {
     setError(null);
     try {
       const { text } = await uploadFiles(files);
-      const examData = await generateExam(text);
+      const examData = await generateExam(text, examSettings);
       setExamQuestions(examData);
       navigate("/exam");
     } catch (err) {
@@ -68,14 +79,14 @@ export default function FileUpload({ setExamQuestions }) {
             </span>)}
         </div>
 
-        {/* Error message in case exam generation fails */}
-        {error && <ErrorMessage message={error} />}
-
         {/* Exam Settings */}
         <details>
           <summary className="text-blue-800 text-sm mt-3" >Customize exam</summary>
-          <ExamSettings />
+          <ExamSettings settings={examSettings} updateSettings={updateSettings} />
         </details>
+
+        {/* Error message in case exam generation fails */}
+        {error && <ErrorMessage message={error} />}
 
         {/* Generate Button */}
         <button

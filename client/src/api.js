@@ -9,13 +9,13 @@ export async function uploadFiles(files) {
     return res.json();
 }
 
-export async function generateExam(text) {
+export async function generateExam(text, examSettings) {
     const res = await fetch("http://localhost:3001/api/generate-exam", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ text })
+        body: JSON.stringify({ text, examSettings })
     });
     if (!res.ok) throw new Error("Failed to generate exam,"); 
     return res.json();

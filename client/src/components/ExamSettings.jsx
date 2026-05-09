@@ -1,7 +1,7 @@
-export default function ExamSettings() {
+export default function ExamSettings({ settings, updateSettings }) {
     return <form className="flex flex-col text-gray-600 text-sm gap-2 mt-5">
-        <label htmlFor="difficulty">Difficulty</label>
-        <select defaultValue="medium" className="p-1.5 rounded-lg border-gray-300 cursor-pointer border" name="difficulty" id="difficulty">
+        <label onChange={(e) => updateSettings("difficulty", e.target.value)} htmlFor="difficulty">Difficulty</label>
+        <select defaultValue={settings.difficulty} className="p-1.5 rounded-lg border-gray-300 cursor-pointer border" name="difficulty" id="difficulty">
             <option value="easy">Easy</option>
             <option value="medium">Medium</option>
             <option value="hard">Hard</option>
@@ -11,36 +11,38 @@ export default function ExamSettings() {
         <label>Question types</label>
         <div className="flex items-center justify-between p-1 rounded-lg border-gray-300 border">
             <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
-                <input defaultChecked type="checkbox" className="accent-blue-600" />
+                <input checked={settings.multipleChoice != 0} type="checkbox" className="accent-blue-600" />
                 Multiple Choice
             </label>
             <input
+                onChange={(e) => updateSettings("multipleChoice", e.target.value)}
                 type="number"
                 min="0"
                 max="10"
-                defaultValue={5}
+                defaultValue={settings.multipleChoice}
                 className="border border-gray-300 rounded-lg w-14 p-1 text-center focus:border-blue-400"
             />
         </div>
 
         <div className="flex items-center justify-between p-1 rounded-lg border-gray-300 border">
             <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
-                <input defaultChecked type="checkbox" className="accent-blue-600" />
+                <input checked={settings.shortAnswer != 0} type="checkbox" className="accent-blue-600" />
                 Short Answer
             </label>
             <input
+                onChange={(e) => updateSettings("shortAnswer", e.target.value)}
                 type="number"
                 min="0"
                 max="10"
-                defaultValue={5}
+                defaultValue={settings.shortAnswer}
                 className="border border-gray-300 rounded-lg w-14 p-1 text-center focus:border-blue-400"
             />
         </div>
 
         <label htmlFor="topics">Focus topics (optional)</label>
-        <input id="topics" className="p-1.5 rounded-lg border-gray-300 border" placeholder="e.g. mitosis, chemical reactions, etc." type="text" />
+        <input onChange={(e) => updateSettings("focusTopics", e.target.value)} id="topics" className="p-1.5 rounded-lg border-gray-300 border" placeholder="e.g. mitosis, chemical reactions, etc." type="text" value={settings.focusTopics} />
 
         <label htmlFor="instructions">Additional instructions (optional)</label>
-        <textarea id="instructions" className="p-1.5 rounded-lg border-gray-300 border" placeholder="e.g. focus on calculation questions, avoid definitions, etc."/>
+        <textarea onChange={(e) => updateSettings("additionalInstructions", e.target.value)} id="instructions" className="p-1.5 rounded-lg border-gray-300 border" placeholder="e.g. focus on calculation questions, avoid definitions, etc." value={settings.additionalInstructions} />
     </form>
 }

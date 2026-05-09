@@ -52,12 +52,12 @@ app.post('/api/upload', upload.array('files'), async (req, res) => {
 
 app.post('/api/generate-exam', async (req, res) => {
   try {
-    const text = req.body.text;
+    const { text, examSettings } = req.body;
 
     if (!text) {
       return res.status(400).json({ error: 'No study material text provided' });
     }
-    const result = await model.generateContent(prompts.generateExam(text));
+    const result = await model.generateContent(prompts.generateExam(text, examSettings));
     const raw = result.response.text().replace(/```json\n?|```/g, '').trim();
     const exam = JSON.parse(raw);
 

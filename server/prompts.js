@@ -1,5 +1,7 @@
-export const generateExam = (text) => `You are an exam generator. Based on the following study material, generate an exam with exactly 5 multiple choice questions and 5 short answer questions.
-
+export const generateExam = (text, examSettings) => `You are an exam generator. Based on the following study material, generate an exam with exactly ${examSettings.multipleChoice} multiple choice questions and ${examSettings.shortAnswer} short answer questions.
+Make the exam of ${examSettings.difficulty}. If mixed, make an even number of easy, hard, and medium questions. 
+Some topics to focus on are ${examSettings.focusTopics}. 
+Some additional instructions are: ${examSettings.additionalInstructions}. 
 Return ONLY a JSON object in this exact format, no markdown, no backticks, no explanation:
 {
   "questions": [
