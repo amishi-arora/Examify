@@ -36,7 +36,7 @@ export default function FileUpload({ setExamQuestions }) {
   }
 
   return (
-    <div className="flex-1 flex items-center justify-center">
+    <div className="flex flex-1 flex-col items-center justify-center">
       <div className="bg-white shadow-md rounded-2xl p-6 w-full max-w-xl">
 
         <h2 className="text-2xl font-semibold mb-4 text-gray-800">
@@ -68,6 +68,15 @@ export default function FileUpload({ setExamQuestions }) {
             </span>)}
         </div>
 
+        {/* Error message in case exam generation fails */}
+        {error && <ErrorMessage message={error} />}
+
+        {/* Exam Settings */}
+        <details>
+          <summary className="text-blue-800 text-sm mt-3" >Customize exam</summary>
+          <ExamSettings />
+        </details>
+
         {/* Generate Button */}
         <button
           onClick={handleGenerate}
@@ -75,11 +84,6 @@ export default function FileUpload({ setExamQuestions }) {
           className="cursor-pointer mt-4 w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-300 disabled:cursor-default">
           {generating ? "Generating..." : "Generate Practice Exam"}
         </button>
-
-        {/* Error message in case exam generation fails */}
-        {error && <ErrorMessage message={error} />}
-
-        <ExamSettings></ExamSettings>
       </div>
     </div>
   );

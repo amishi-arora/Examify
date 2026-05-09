@@ -11,7 +11,7 @@ export default function ExamSettings() {
         <label>Question types</label>
         <div className="flex items-center justify-between p-1 rounded-lg border-gray-300 border">
             <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
-                <input defaultChecked type="checkbox" className="accent-blue-500" />
+                <input defaultChecked type="checkbox" className="accent-blue-600" />
                 Multiple Choice
             </label>
             <input
@@ -25,7 +25,7 @@ export default function ExamSettings() {
 
         <div className="flex items-center justify-between p-1 rounded-lg border-gray-300 border">
             <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
-                <input defaultChecked type="checkbox" className="accent-blue-500" />
+                <input defaultChecked type="checkbox" className="accent-blue-600" />
                 Short Answer
             </label>
             <input
