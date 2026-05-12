@@ -9,16 +9,19 @@ export default function FileUpload({ setExamQuestions }) {
   const [files, setFiles] = useState([]);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState(null);
-  const [examSettings, setSettings] = useState({
+  const [examSettings, setExamSettings] = useState({
     difficulty: "medium",
-    multipleChoice: 5,
-    shortAnswer: 5,
+    multipleChoice: "5",
+    shortAnswer: "5",
     focusTopics: "",
     additionalInstructions: ""
   });
+  const noQuestionTypesSelected =
+    (examSettings.shortAnswer === "0" || examSettings.shortAnswer === "") &&
+    (examSettings.multipleChoice === "0" || examSettings.multipleChoice === "");
 
   function updateSettings(setting, value) {
-    setSettings(prev => ({ ...prev, [setting]: value }));
+    setExamSettings(prev => ({ ...prev, [setting]: value }));
   }
 
   async function handleGenerate() {
@@ -91,7 +94,7 @@ export default function FileUpload({ setExamQuestions }) {
         {/* Generate Button */}
         <button
           onClick={handleGenerate}
-          disabled={files.length === 0 || generating}
+          disabled={files.length === 0 || generating || noQuestionTypesSelected}
           className="cursor-pointer mt-4 w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-300 disabled:cursor-default">
           {generating ? "Generating..." : "Generate Practice Exam"}
         </button>
