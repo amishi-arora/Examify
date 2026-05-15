@@ -4,6 +4,7 @@ import cors from 'cors';
 import multer from 'multer';
 import dotenv from 'dotenv';
 import * as prompts from "./prompts.js";
+import db from './db.js'; 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 dotenv.config();
 
