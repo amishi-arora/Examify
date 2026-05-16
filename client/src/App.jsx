@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import ExamPage from "./pages/ExamPage";
 import ExamResultsPage from "./pages/ExamResultsPage";
+import SignInPage from "./pages/SignInPage";
 
 function App() {
   const [questions, setExamQuestions] = useState(null);
@@ -12,6 +13,9 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="signin" element={
+          <SignInPage />
+        } />
         <Route path="/" element={
           <HomePage setExamQuestions={setExamQuestions} />
         } />

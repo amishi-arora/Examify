@@ -50,7 +50,6 @@ export default function FileUpload({ setExamQuestions }) {
   }
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center">
       <div className="bg-white shadow-md rounded-2xl p-6 w-full max-w-xl">
 
         <h2 className="text-2xl font-semibold mb-4 text-gray-800">
@@ -99,6 +98,5 @@ export default function FileUpload({ setExamQuestions }) {
           {generating ? "Generating..." : "Generate Practice Exam"}
         </button>
       </div>
-    </div>
   );
 }
