@@ -1,34 +1,69 @@
 export async function uploadFiles(files) {
-    const formData = new FormData();
-    files.forEach(f => formData.append("files", f));
-    const res = await fetch("http://localhost:3001/api/upload", {
-        method: "POST",
-        body: formData
-    });
-    if (!res.ok) throw new Error("Failed to upload files"); 
-    return res.json();
+  const formData = new FormData();
+  files.forEach(f => formData.append("files", f));
+  const res = await fetch("http://localhost:3001/api/upload", {
+    method: "POST",
+    body: formData
+  });
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.error);
+  }
+  return res.json();
 }
 
 export async function generateExam(text, examSettings) {
-    const res = await fetch("http://localhost:3001/api/generate-exam", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ text, examSettings })
-    });
-    if (!res.ok) throw new Error("Failed to generate exam,"); 
-    return res.json();
+  const res = await fetch("http://localhost:3001/api/generate-exam", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ text, examSettings })
+  });
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.error);
+  }
+  return res.json();
 }
 
 export async function gradeExam(studentAnswers, examQuestions) {
-    const res = await fetch("http://localhost:3001/api/grade-exam", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ studentAnswers, examQuestions })
-    });
-    if (!res.ok) throw new Error("Failed to grade exam."); 
-    return res.json();
+  const res = await fetch("http://localhost:3001/api/grade-exam", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ studentAnswers, examQuestions })
+  });
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.error);
+  }
+  return res.json();
+}
+
+export async function login(email, password) {
+  const res = await fetch("http://localhost:3001/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  });
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.error);
+  }
+  return res.json();
+}
+
+export async function register(name, email, password) {
+  const res = await fetch("http://localhost:3001/api/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password })
+  });
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.error);
+  }
+  return res.json();
 }

@@ -13,19 +13,19 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="signin" element={
+        <Route path="/" element={
           <SignInPage />
         } />
-        <Route path="/" element={
+        <Route path="/home" element={
           <HomePage setExamQuestions={setExamQuestions} />
         } />
         <Route path="/exam" element={questions ?
           <ExamPage studentAnswers={examAnswers} examQuestions={questions} setExamAnswers={setExamAnswers} setExamResults={setExamResults} /> :
-          <Navigate to="/" />
+          <Navigate to="/home" />
         } />
         <Route path="/results" element={examResults ?
           <ExamResultsPage examQuestions={questions} examAnswers={examAnswers} examResults={examResults} /> :
-          <Navigate to="/" />
+          <Navigate to="/home" />
         } />
       </Routes>
     </BrowserRouter>
