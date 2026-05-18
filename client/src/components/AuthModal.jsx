@@ -16,6 +16,10 @@ export default function AuthModal() {
                 localStorage.setItem("token", token);
                 localStorage.setItem("name", name);
             } else {
+                if(fd.get("password") !== fd.get("confirmPassword")) {
+                    setError("Password do not match"); 
+                    return; 
+                }
                 const { token, name } = await register(fd.get("name"), fd.get("email"), fd.get("password"));
                 localStorage.setItem("token", token);
                 localStorage.setItem("name", name);
@@ -81,3 +85,5 @@ export default function AuthModal() {
         </div>
     )
 }
+
+// clear fields on toggle 

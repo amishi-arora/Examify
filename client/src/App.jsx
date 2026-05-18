@@ -6,6 +6,7 @@ import ExamResultsPage from "./pages/ExamResultsPage";
 import SignInPage from "./pages/SignInPage";
 
 function App() {
+  const token = localStorage.getItem("token"); 
   const [questions, setExamQuestions] = useState(null);
   const [examAnswers, setExamAnswers] = useState({});
   const [examResults, setExamResults] = useState({})
@@ -16,14 +17,12 @@ function App() {
         <Route path="/" element={
           <SignInPage />
         } />
-        <Route path="/home" element={
-          <HomePage setExamQuestions={setExamQuestions} />
-        } />
-        <Route path="/exam" element={questions ?
+        <Route path="/home" element={token ? <HomePage setExamQuestions={setExamQuestions} /> : <Navigate to="/" />} />
+        <Route path="/exam" element={token && questions ?
           <ExamPage studentAnswers={examAnswers} examQuestions={questions} setExamAnswers={setExamAnswers} setExamResults={setExamResults} /> :
           <Navigate to="/home" />
         } />
-        <Route path="/results" element={examResults ?
+        <Route path="/results" element={token && examResults ?
           <ExamResultsPage examQuestions={questions} examAnswers={examAnswers} examResults={examResults} /> :
           <Navigate to="/home" />
         } />

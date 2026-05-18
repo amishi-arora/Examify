@@ -3,6 +3,7 @@ export async function uploadFiles(files) {
   files.forEach(f => formData.append("files", f));
   const res = await fetch("http://localhost:3001/api/upload", {
     method: "POST",
+    headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }, 
     body: formData
   });
   if (!res.ok) {
@@ -16,7 +17,8 @@ export async function generateExam(text, examSettings) {
   const res = await fetch("http://localhost:3001/api/generate-exam", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("token")}` // called here, not at module level
     },
     body: JSON.stringify({ text, examSettings })
   });
@@ -31,7 +33,8 @@ export async function gradeExam(studentAnswers, examQuestions) {
   const res = await fetch("http://localhost:3001/api/grade-exam", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("token")}` // called here, not at module level
     },
     body: JSON.stringify({ studentAnswers, examQuestions })
   });
@@ -67,3 +70,5 @@ export async function register(name, email, password) {
   }
   return res.json();
 }
+
+// adding local storage get inside 

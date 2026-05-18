@@ -43,8 +43,19 @@ const extractText = async (file) => {
   }
 };
 
+// --- JWT Middleware --- 
+function authenticateToken(req, res, next) {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: "Invalid token" });
+    req.user = user;
+    next();
+  });
+}
+
 // --- Routes -- 
-app.post('/api/upload', upload.array('files'), async (req, res) => {
+app.post('/api/upload', authenticateToken, upload.array('files'), async (req, res) => {
   try {
     const files = req.files;
     let texts = await Promise.all(files.map(extractText));
@@ -56,7 +67,7 @@ app.post('/api/upload', upload.array('files'), async (req, res) => {
   }
 });
 
-app.post('/api/generate-exam', async (req, res) => {
+app.post('/api/generate-exam', authenticateToken, async (req, res) => {
   try {
     const { text, examSettings } = req.body;
 
@@ -74,7 +85,7 @@ app.post('/api/generate-exam', async (req, res) => {
   }
 });
 
-app.post('/api/grade-exam', async (req, res) => {
+app.post('/api/grade-exam', authenticateToken, async (req, res) => {
   try {
     const results = {};
     const { examQuestions, studentAnswers } = req.body;
@@ -140,7 +151,7 @@ app.post('/api/register', async (req, res) => {
       Item: { userId, name, email, password: hashedPassword }
     }));
 
-    const token = jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '1d' });
     res.json({ token, name });
   } catch (err) {
     console.error(err);
@@ -176,7 +187,7 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    const token = jwt.sign({ userId: user.userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ userId: user.userId }, process.env.JWT_SECRET, { expiresIn: '1d' });
     res.json({ token, name: user.name });
   } catch (err) {
     console.error(err);
