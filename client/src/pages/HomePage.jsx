@@ -1,5 +1,6 @@
 import Header from "../components/Header";
 import FileUpload from "../components/FileUpload"
+import RecentExams from "../components/RecentExams";
 
 export default function HomePage({ setExamQuestions }) {
     const greeting = `Welcome back, ${localStorage.getItem("name")}`
@@ -7,6 +8,7 @@ export default function HomePage({ setExamQuestions }) {
         <main className="flex flex-col min-h-screen bg-stone-50 p-15 justify-center items-center gap-10">
             <Header title = {greeting} subtitle = "Are you ready to prepare for your next exam?" />
             <FileUpload setExamQuestions={setExamQuestions} />
+            <RecentExams></RecentExams>
         </main>
     )
 }

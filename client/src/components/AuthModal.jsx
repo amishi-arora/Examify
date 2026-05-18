@@ -86,5 +86,3 @@ export default function AuthModal() {
         </div>
     )
 }
-
-// clear fields on toggle 

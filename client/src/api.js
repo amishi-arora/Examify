@@ -70,5 +70,3 @@ export async function register(name, email, password) {
   }
   return res.json();
 }
-
-// adding local storage get inside 
