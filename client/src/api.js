@@ -18,7 +18,7 @@ export async function generateExam(text, examSettings) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${localStorage.getItem("token")}` // called here, not at module level
+      "Authorization": `Bearer ${localStorage.getItem("token")}`
     },
     body: JSON.stringify({ text, examSettings })
   });
@@ -34,7 +34,7 @@ export async function gradeExam(studentAnswers, examQuestions) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${localStorage.getItem("token")}` // called here, not at module level
+      "Authorization": `Bearer ${localStorage.getItem("token")}`
     },
     body: JSON.stringify({ studentAnswers, examQuestions })
   });

@@ -30,9 +30,10 @@ export default function AuthModal() {
             setError(err.message);
         }
     }
+
     return (
         <div className="flex flex-col bg-white border border-gray-300 rounded-xl shadow-md p-8 w-full max-w-sm gap-5">
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-sm text-gray-600">
+            <form key={loginMode} onSubmit={handleSubmit} className="flex flex-col gap-4 text-sm text-gray-600">
                 {!loginMode && <div className="flex flex-col gap-1.5">
                     <label>Name</label>
                     <input
