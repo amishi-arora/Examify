@@ -4,6 +4,7 @@ ${examSettings.focusTopics ? `Focus on these topics if they are relevant to the 
 ${examSettings.additionalInstructions ? `Additional instructions: ${examSettings.additionalInstructions}.` : ""}
 Return ONLY a JSON object in this exact format, no markdown, no backticks, no explanation. List all multiple choice questions first, followed by short answer questions:
 {
+  "title": "Short exam title (max 5 words) that describes the main topic of the study material",
   "questions": [
     {
       "id": 1,

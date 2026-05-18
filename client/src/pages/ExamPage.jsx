@@ -30,7 +30,7 @@ export default function ExamPage({ studentAnswers, examQuestions, setExamAnswers
     }
 
     return <main className="flex flex-col items-center min-h-screen bg-stone-50 p-15 gap-10">
-        <Header title="Practice Exam" />
+        <Header title={examQuestions.title} />
         {examQuestions.questions.map((q, i) => <ExamQuestion key={i} question={q} handleAnswer={handleAnswer} />)}
         <button disabled={grading} onClick={handleSubmit} className="cursor-pointer bg-blue-500 text-white py-3 px-9 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-300 disabled:cursor-default">
             {grading ? "Grading..." : "Submit Exam"}
