@@ -3,7 +3,7 @@ export async function uploadFiles(files) {
   files.forEach(f => formData.append("files", f));
   const res = await fetch("http://localhost:3001/api/upload", {
     method: "POST",
-    headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }, 
+    headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
     body: formData
   });
   if (!res.ok) {
@@ -64,6 +64,37 @@ export async function register(name, email, password) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, email, password })
   });
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.error);
+  }
+  return res.json();
+}
+
+export async function saveExam(title, questions, difficulty) {
+  const res = await fetch("http://localhost:3001/api/save-exam", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("token")}`
+    },
+    body: JSON.stringify({ title, questions, difficulty })
+  });
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.error);
+  }
+  return res.json();
+
+}
+
+export async function getExams() {
+  const res = await fetch("http://localhost:3001/api/get-exams", {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${localStorage.getItem("token")}`
+    },
+  })
   if (!res.ok) {
     const data = await res.json();
     throw new Error(data.error);

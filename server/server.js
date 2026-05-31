@@ -15,7 +15,7 @@ dotenv.config();
 
 // --- AI Setup --- 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
+const model = genAI.getGenerativeModel({ model: '	gemini-3.1-flash-lite' });
 
 // --- Middleware ---
 const app = express();
@@ -194,6 +194,44 @@ app.post('/api/login', async (req, res) => {
     res.status(500).json({ error: 'Failed to login' });
   }
 });
+
+app.post('/api/save-exam', authenticateToken, async (req, res) => {
+  try {
+    const { title, questions, difficulty} = req.body;
+    if (!title || !questions || !difficulty) {
+      return res.status(400).json({ error: 'All exam information is required' });
+    }
+    const examId = uuidv4();
+    const date = new Date().toDateString(); 
+    const userId = req.user.userId;
+    await db.send(new PutCommand({
+      TableName: 'Exams',
+      Item: { examId, userId, title, questions, difficulty, date}
+    }));
+    res.json({examId})
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to save exam' });
+  }
+});
+
+
+app.get('/api/get-exams', authenticateToken, async (req, res) => {
+  try {
+    // Find exams by userId
+    const result = await db.send(new QueryCommand({
+      TableName: 'Exams',
+      IndexName: 'userId-index',
+      KeyConditionExpression: 'userId = :userId',
+      ExpressionAttributeValues: { ':userId': req.user.userId }
+    }));
+    res.json(result.Items);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to get exams' });
+  }
+})
 
 // --- Start Server ---
 const PORT = process.env.PORT || 3001;
