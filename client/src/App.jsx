@@ -6,8 +6,8 @@ import ExamResultsPage from "./pages/ExamResultsPage";
 import SignInPage from "./pages/SignInPage";
 
 function App() {
-  const token = localStorage.getItem("token"); 
-  const [questions, setExamQuestions] = useState(null);
+  const token = localStorage.getItem("token");
+  const [questions, setExamQuestions] = useState({});
   const [examAnswers, setExamAnswers] = useState({});
   const [examResults, setExamResults] = useState({})
 

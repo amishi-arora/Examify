@@ -197,18 +197,22 @@ app.post('/api/login', async (req, res) => {
 
 app.post('/api/save-exam', authenticateToken, async (req, res) => {
   try {
-    const { title, questions, difficulty} = req.body;
-    if (!title || !questions || !difficulty) {
+    const { title, questions, difficulty, results, studentAnswers } = req.body;
+    if (!title || !questions || !difficulty || !results || !studentAnswers) {
       return res.status(400).json({ error: 'All exam information is required' });
     }
     const examId = uuidv4();
-    const date = new Date().toDateString(); 
+    const date = new Date().toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    });
     const userId = req.user.userId;
     await db.send(new PutCommand({
       TableName: 'Exams',
-      Item: { examId, userId, title, questions, difficulty, date}
+      Item: { examId, userId, title, questions, difficulty, date, results, studentAnswers }
     }));
-    res.json({examId})
+    res.json({ examId })
 
   } catch (err) {
     console.error(err);
@@ -231,7 +235,7 @@ app.get('/api/get-exams', authenticateToken, async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Failed to get exams' });
   }
-})
+});
 
 // --- Start Server ---
 const PORT = process.env.PORT || 3001;

@@ -10,7 +10,7 @@ export default function FileUpload({ setExamQuestions }) {
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState(null);
   const [examSettings, setExamSettings] = useState({
-    difficulty: "medium",
+    difficulty: "Medium",
     multipleChoice: "5",
     shortAnswer: "5",
     focusTopics: "",

@@ -14,7 +14,7 @@ export default function ExamPage({ studentAnswers, examQuestions, setExamAnswers
         setGrading(true);
         try {
             const results = await gradeExam(studentAnswers, examQuestions);
-            await saveExam(examQuestions.title, examQuestions.questions.length, examQuestions.difficulty);
+            await saveExam(examQuestions.title, examQuestions.questions, examQuestions.difficulty, results, studentAnswers);
             setExamResults(results);
             navigate("/results");
         } catch (err) {

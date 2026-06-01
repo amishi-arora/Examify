@@ -12,10 +12,10 @@ export default function ExamSettings({ settings, updateSettings }) {
     return <form className="flex flex-col text-gray-600 text-sm gap-2 mt-5">
         <label htmlFor="difficulty">Difficulty</label>
         <select onChange={(e) => updateSettings("difficulty", e.target.value)} value={settings.difficulty} className="p-1.5 rounded-lg border-gray-300 cursor-pointer border" name="difficulty" id="difficulty">
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-            <option value="mixed">Mixed</option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+            <option value="Mixed">Mixed</option>
         </select>
 
         <label>Question types</label>
@@ -48,7 +48,7 @@ export default function ExamSettings({ settings, updateSettings }) {
                 className="border border-gray-300 rounded-lg w-14 p-1 text-center focus:border-blue-400"
             />
         </div>
-        {noQuestionTypesSelected && <ErrorMessage message="Please select at least one question type"/>}
+        {noQuestionTypesSelected && <ErrorMessage message="Please select at least one question type" />}
 
         <label htmlFor="topics">Focus topics (optional)</label>
         <input onChange={(e) => updateSettings("focusTopics", e.target.value)} id="topics" className="p-1.5 rounded-lg border-gray-300 border" placeholder="e.g. mitosis, chemical reactions, etc." type="text" value={settings.focusTopics} />
