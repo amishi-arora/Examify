@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import Header from "../components/Header"
 import GradedExamQuestion from "../components/GradedExamQuestion"
 import ScoreBanner from "../components/ScoreBanner";
+import InsightsCard from "../components/InsightsCard";
 
 export default function ExamResultsPage({ examQuestions, examAnswers, examResults }) {
     const { state } = useLocation();
@@ -20,6 +21,8 @@ export default function ExamResultsPage({ examQuestions, examAnswers, examResult
             <Header title="Exam Results" />
 
             <ScoreBanner score={score} total={total} />
+
+            <InsightsCard />
 
             {examQuestions.questions.map((q, i) => <GradedExamQuestion key={i} studentAnswer={examAnswers[q.id]} question={q} result={examResults[q.id]} />)}
         </main>

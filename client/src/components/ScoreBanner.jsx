@@ -9,7 +9,7 @@ export default function ScoreBanner({ score, total }) {
     const { feedback, colour } = getScoreFeedback(ratio);
 
     return (
-        <div className="flex flex-col items-center gap-1 bg-white p-4 shadow-md rounded-2xl w-1/3">
+        <div className="flex flex-col items-center gap-1 bg-white p-4 shadow-md rounded-2xl w-1/2">
             <p className="text-sm">Your score</p>
             <p className={`text-5xl ${colour}`}>{`${score}/${total}`}</p>
             <p className={`text-sm ${colour}`}>{feedback}</p>

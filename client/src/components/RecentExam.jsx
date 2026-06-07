@@ -13,7 +13,7 @@ export default function RecentExam({ title, questions, difficulty, date, results
 
     function navigateToResultsPage() {
         navigate("/results", {
-            state: { examQuestions: { questions }, examResults: results, examAnswers: { studentAnswers } }
+            state: { examQuestions: { questions }, examResults: results, examAnswers: studentAnswers }
         });
     }
 
