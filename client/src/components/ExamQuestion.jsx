@@ -2,15 +2,15 @@ import MultipleChoiceOption from "./MultipleChoiceOption"
 
 export default function ExamQuestion({ question, handleAnswer }) {
     const tag = `Q${question.id} • ${question.type}`
-    const tagColor = question.type === "Multiple choice" ? "bg-blue-100 text-blue-800" : "bg-purple-100 text-purple-800"; 
+    const tagColor = question.type === "Multiple choice" ? "bg-blue-100 text-blue-800" : "bg-purple-100 text-purple-800";
 
-    return <div className="flex flex-col gap-3 bg-white p-10 shadow-md rounded-2xl w-1/2">
+    return <div className="flex flex-col gap-3 bg-white p-10 shadow-md rounded-2xl w-2/3 min-[1500px]:w-1/2">
         <span className={`text-xs p-1 w-fit rounded-xl transition duration-150 ease hover:scale-102 ${tagColor}`}>{tag}</span>
         <p className="font-bold">{question.questionText}</p>
 
         {/* Multiple choice options for MCQ's. Text area for short answer Q's*/}
         {question.type === "Multiple choice" ? <div className="flex flex-col gap-3">
-            {question.options.map((o, i) => 
+            {question.options.map((o, i) =>
                 <MultipleChoiceOption key={i} index={i} id={question.id} option={o} handleAnswer={() => handleAnswer(question.id, o)} />
             )}
         </div> :
