@@ -71,14 +71,14 @@ export async function register(name, email, password) {
   return res.json();
 }
 
-export async function saveExam(title, questions, difficulty, results, studentAnswers) {
+export async function saveExam(title, questions, difficulty, results, studentAnswers, insights) {
   const res = await fetch("http://localhost:3001/api/save-exam", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${localStorage.getItem("token")}`
     },
-    body: JSON.stringify({ title, questions, difficulty, results, studentAnswers })
+    body: JSON.stringify({ title, questions, difficulty, results, studentAnswers, insights })
   });
   if (!res.ok) {
     const data = await res.json();
@@ -94,6 +94,22 @@ export async function getExams() {
     headers: {
       "Authorization": `Bearer ${localStorage.getItem("token")}`
     },
+  })
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.error);
+  }
+  return res.json();
+}
+
+export async function generateInsights(examQuestions, studentAnswers, examResults) {
+  const res = await fetch("http://localhost:3001/api/generate-insights", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("token")}`
+    },
+    body: JSON.stringify({ examQuestions, studentAnswers, examResults })
   })
   if (!res.ok) {
     const data = await res.json();

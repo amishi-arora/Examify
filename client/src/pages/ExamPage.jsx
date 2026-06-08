@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { gradeExam, saveExam } from "../api.js";
+import { generateInsights, gradeExam, saveExam } from "../api.js";
 import ExamQuestion from "../components/ExamQuestion"
 import Header from "../components/Header"
 import ErrorMessage from "../components/ErrorMessage.jsx";
 
-export default function ExamPage({ studentAnswers, examQuestions, setExamAnswers, setExamResults }) {
+export default function ExamPage({ studentAnswers, examQuestions, setExamAnswers, setExamResults, setInsights }) {
     const navigate = useNavigate();
     const [grading, setGrading] = useState(false);
     const [error, setError] = useState(null);
@@ -14,8 +14,10 @@ export default function ExamPage({ studentAnswers, examQuestions, setExamAnswers
         setGrading(true);
         try {
             const results = await gradeExam(studentAnswers, examQuestions);
-            await saveExam(examQuestions.title, examQuestions.questions, examQuestions.difficulty, results, studentAnswers);
+            const insights = await generateInsights(examQuestions, studentAnswers, results);
+            await saveExam(examQuestions.title, examQuestions.questions, examQuestions.difficulty, results, studentAnswers, insights);
             setExamResults(results);
+            setInsights(insights);
             navigate("/results");
         } catch (err) {
             console.log(err);

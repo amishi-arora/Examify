@@ -6,14 +6,14 @@ function getScoreColour(ratio) {
     else return "border-green-600 bg-green-50 text-green-900";
 }
 
-export default function RecentExam({ title, questions, difficulty, date, results, studentAnswers }) {
+export default function RecentExam({ title, questions, difficulty, date, results, studentAnswers, insights }) {
     const score = Object.values(results).reduce((sum, r) => sum + r.score, 0);
     const colour = getScoreColour(score / questions.length);
     const navigate = useNavigate();
 
     function navigateToResultsPage() {
         navigate("/results", {
-            state: { examQuestions: { questions }, examResults: results, examAnswers: studentAnswers }
+            state: { examQuestions: { questions }, examResults: results, examAnswers: studentAnswers, insights: insights }
         });
     }
 

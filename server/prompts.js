@@ -25,11 +25,41 @@ Return ONLY a JSON object in this exact format, no markdown, no backticks, no ex
 Study material:
 ${text}`
 
+export const generateInsights = (examQuestions, examResults, examAnswers) => `You are an AI tutor analyzing a student's exam performance. 
+
+Given the exam questions, student answers, and exam results, generate personalized feedback describing the studen't understanding of the material.
+
+Return ONLY a JSON object in this exact format, no markdown, no backticks, no explanation: 
+
+{
+  "feedback": "3-5 sentences describing the students overall understanding. 
+  Mention specific topics they excelled in and specific topics they should review"
+
+  "strongTopics": ["specific topic 1", "specific topics 2"], 
+
+  "weakTopics": ["specific topic 1", "specific topic 2"]
+}
+
+Guidelines: 
+- Topics should be specific concepts (e.g. "mitosis, "ATP production"), not broad subjects
+- A score of 1 indicates the student understood that topic well
+- A score of 0.5 indicates partial understanding
+- A score of 0 indicates the student struggled with that topic
+- Leave strongTopics as an empty array if the student got nothing correct
+- Leave weakTopics as an empty array if the student got everything correct
+- The weakTopics and strongTopics array should contain a maximum of 5 topics each 
+- Base topics on the actual subject matter of each question 
+
+exam questions: ${JSON.stringify(examQuestions)}
+students answers (mapped to the question id): ${JSON.stringify(examAnswers)} 
+exam results, including score and feedback per question (mapped to question id): ${JSON.stringify(examResults)} 
+`
+
 export const gradeShortAnswers = (questions, studentAnswers) => `You are an exam grader.
 
     Grade each of the following short answer questions and return ONLY a JSON array in this exact format, no markdown, no backticks, no explanation:
     [
-      {"id": 1, "score": 0 | 0.5 | 1, "feedback": "brief explanation, 1-2 lines. If no answer was provided, return, 'No answer was provided'"}
+      {"id": 1, "score": 0 | 0.5 | 1, "feedback": "brief explanation, 1-2 lines."}
     ]
 
     Questions:

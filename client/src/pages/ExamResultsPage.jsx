@@ -1,17 +1,17 @@
 import { useLocation } from "react-router-dom";
-
 import Header from "../components/Header"
 import GradedExamQuestion from "../components/GradedExamQuestion"
 import ScoreBanner from "../components/ScoreBanner";
 import InsightsCard from "../components/InsightsCard";
 
-export default function ExamResultsPage({ examQuestions, examAnswers, examResults }) {
+export default function ExamResultsPage({ examQuestions, examAnswers, examResults, insights }) {
     const { state } = useLocation();
 
     // Use navigation state if available. Otherwise, use props 
     examQuestions = state?.examQuestions || examQuestions;
     examResults = state?.examResults || examResults;
     examAnswers = state?.examAnswers || examAnswers;
+    insights = state?.insights || insights;
 
     const score = Object.values(examResults).reduce((sum, r) => sum + r.score, 0);
     const total = examQuestions.questions.length;
@@ -22,7 +22,7 @@ export default function ExamResultsPage({ examQuestions, examAnswers, examResult
 
             <ScoreBanner score={score} total={total} />
 
-            <InsightsCard />
+            <InsightsCard insights={insights} />
 
             {examQuestions.questions.map((q, i) => <GradedExamQuestion key={i} studentAnswer={examAnswers[q.id]} question={q} result={examResults[q.id]} />)}
         </main>

@@ -197,7 +197,7 @@ app.post('/api/login', async (req, res) => {
 
 app.post('/api/save-exam', authenticateToken, async (req, res) => {
   try {
-    const { title, questions, difficulty, results, studentAnswers } = req.body;
+    const { title, questions, difficulty, results, studentAnswers, insights } = req.body;
     if (!title || !questions || !difficulty || !results || !studentAnswers) {
       return res.status(400).json({ error: 'All exam information is required' });
     }
@@ -210,7 +210,7 @@ app.post('/api/save-exam', authenticateToken, async (req, res) => {
     const userId = req.user.userId;
     await db.send(new PutCommand({
       TableName: 'Exams',
-      Item: { examId, userId, title, questions, difficulty, date, results, studentAnswers }
+      Item: { examId, userId, title, questions, difficulty, date, results, studentAnswers, insights }
     }));
     res.json({ examId })
 
@@ -234,6 +234,20 @@ app.get('/api/get-exams', authenticateToken, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to get exams' });
+  }
+});
+
+app.post('/api/generate-insights', authenticateToken, async (req, res) => {
+  try {
+    const { examQuestions, studentAnswers, examResults } = req.body;
+
+    const result = await model.generateContent(prompts.generateInsights(examQuestions, examResults, studentAnswers));
+    const raw = result.response.text().replace(/```json\n?|```/g, '').trim();
+
+    res.json(JSON.parse(raw));
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to generate insights' });
   }
 });
 
