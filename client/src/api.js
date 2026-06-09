@@ -117,3 +117,17 @@ export async function generateInsights(examQuestions, studentAnswers, examResult
   }
   return res.json();
 }
+
+export async function getExam(examId) {
+  const res = await fetch(`http://localhost:3001/api/get-exam?examId=${examId}`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${localStorage.getItem("token")}`
+    },
+  })
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.error);
+  }
+  return res.json();
+}

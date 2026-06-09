@@ -237,6 +237,20 @@ app.get('/api/get-exams', authenticateToken, async (req, res) => {
   }
 });
 
+app.get('/api/get-exam', authenticateToken, async (req, res) => {
+  try {
+    const examId = req.query.examId;
+    const result = await db.send(new GetCommand({
+      TableName: 'Exams',
+      Key: { examId: examId }
+    }));
+    res.json(result.Item);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to get exam' });
+  }
+});
+
 app.post('/api/generate-insights', authenticateToken, async (req, res) => {
   try {
     const { examQuestions, studentAnswers, examResults } = req.body;

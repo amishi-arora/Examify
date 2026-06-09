@@ -9,8 +9,6 @@ function App() {
   const token = localStorage.getItem("token");
   const [questions, setExamQuestions] = useState({});
   const [examAnswers, setExamAnswers] = useState({});
-  const [examResults, setExamResults] = useState({});
-  const [insights, setInsights] = useState({});
 
   return (
     <BrowserRouter>
@@ -20,11 +18,11 @@ function App() {
         } />
         <Route path="/home" element={token ? <HomePage setExamQuestions={setExamQuestions} /> : <Navigate to="/" />} />
         <Route path="/exam" element={token && questions ?
-          <ExamPage studentAnswers={examAnswers} examQuestions={questions} setExamAnswers={setExamAnswers} setExamResults={setExamResults} setInsights={setInsights} /> :
+          <ExamPage studentAnswers={examAnswers} examQuestions={questions} setExamAnswers={setExamAnswers} /> :
           <Navigate to="/home" />
         } />
-        <Route path="/results" element={token && examResults ?
-          <ExamResultsPage examQuestions={questions} examAnswers={examAnswers} examResults={examResults} insights={insights} /> :
+        <Route path="/results" element={token ?
+          <ExamResultsPage /> :
           <Navigate to="/home" />
         } />
       </Routes>

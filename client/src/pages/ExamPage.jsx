@@ -5,7 +5,7 @@ import ExamQuestion from "../components/ExamQuestion"
 import Header from "../components/Header"
 import ErrorMessage from "../components/ErrorMessage.jsx";
 
-export default function ExamPage({ studentAnswers, examQuestions, setExamAnswers, setExamResults, setInsights }) {
+export default function ExamPage({ studentAnswers, examQuestions, setExamAnswers }) {
     const navigate = useNavigate();
     const [grading, setGrading] = useState(false);
     const [error, setError] = useState(null);
@@ -15,10 +15,11 @@ export default function ExamPage({ studentAnswers, examQuestions, setExamAnswers
         try {
             const results = await gradeExam(studentAnswers, examQuestions);
             const insights = await generateInsights(examQuestions, studentAnswers, results);
-            await saveExam(examQuestions.title, examQuestions.questions, examQuestions.difficulty, results, studentAnswers, insights);
-            setExamResults(results);
-            setInsights(insights);
-            navigate("/results");
+            const { id } = await saveExam(examQuestions.title, examQuestions.questions, examQuestions.difficulty, results, studentAnswers, insights);
+
+            navigate("/results", {
+                state: { examId: id }
+            });
         } catch (err) {
             console.log(err);
             setError("Failed to grade exam. Please try again.");

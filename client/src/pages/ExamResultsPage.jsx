@@ -1,20 +1,25 @@
 import { useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { getExam } from "../api";
 import Header from "../components/Header"
 import GradedExamQuestion from "../components/GradedExamQuestion"
 import ScoreBanner from "../components/ScoreBanner";
 import InsightsCard from "../components/InsightsCard";
 
-export default function ExamResultsPage({ examQuestions, examAnswers, examResults, insights }) {
+export default function ExamResultsPage() {
     const { state } = useLocation();
+    const [exam, setExam] = useState(null);
 
-    // Use navigation state if available. Otherwise, use props 
-    examQuestions = state?.examQuestions || examQuestions;
-    examResults = state?.examResults || examResults;
-    examAnswers = state?.examAnswers || examAnswers;
-    insights = state?.insights || insights;
+    useEffect(() => {
+        async function fetchExam() {
+            const data = await getExam(state.examId);
+            setExam(data);
+        }
+        fetchExam();
+    }, []);
 
-    const score = Object.values(examResults).reduce((sum, r) => sum + r.score, 0);
-    const total = examQuestions.questions.length;
+    const score = exam ? Object.values(exam.results).reduce((sum, r) => sum + r.score, 0) : 0;
+    const total = exam ? exam.questions.length : 0;
 
     return (
         <main className="flex flex-col items-center min-h-screen bg-stone-50 p-15 gap-10">
@@ -22,9 +27,9 @@ export default function ExamResultsPage({ examQuestions, examAnswers, examResult
 
             <ScoreBanner score={score} total={total} />
 
-            <InsightsCard insights={insights} />
+            {exam && <InsightsCard insights={exam.insights} />}
 
-            {examQuestions.questions.map((q, i) => <GradedExamQuestion key={i} studentAnswer={examAnswers[q.id]} question={q} result={examResults[q.id]} />)}
+            {exam && exam.questions.map((q, i) => <GradedExamQuestion key={i} studentAnswer={exam.studentAnswers[q.id]} question={q} result={exam.results[q.id]} />)}
         </main>
     )
 }
