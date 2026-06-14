@@ -5,7 +5,7 @@ ${examSettings.additionalInstructions ? `Additional instructions: ${examSettings
 Return ONLY a JSON object in this exact format, no markdown, no backticks, no explanation. List all multiple choice questions first, followed by short answer questions:
 {
   "title": "Short exam title (max 5 words) that describes the main topic of the study material",
-  "difficulty": ${examSettings.difficulty},
+  "difficulty": "${examSettings.difficulty}",
   "questions": [
     {
       "id": 1,
@@ -32,8 +32,8 @@ Given the exam questions, student answers, and exam results, generate personaliz
 Return ONLY a JSON object in this exact format, no markdown, no backticks, no explanation: 
 
 {
-  "feedback": "3-5 sentences describing the students overall understanding. 
-  Mention specific topics they excelled in and specific topics they should review"
+  "feedback": "3-5 sentences describing the students overall understanding.
+  Mention specific topics they excelled in and specific topics they should review",
 
   "strongTopics": ["specific topic 1", "specific topics 2"], 
 
@@ -57,20 +57,20 @@ exam results, including score and feedback per question (mapped to question id):
 
 export const gradeShortAnswers = (questions, studentAnswers) => `You are an exam grader.
 
-    Grade each of the following short answer questions and return ONLY a JSON array in this exact format, no markdown, no backticks, no explanation:
-    [
-      {"id": 1, "score": 0 | 0.5 | 1, "feedback": "brief explanation, 1-2 lines."}
-    ]
+Grade each of the following short answer questions and return ONLY a JSON array in this exact format, no markdown, no backticks, no explanation:
+[
+  {"id": 1, "score": 0 | 0.5 | 1, "feedback": "brief explanation, 1-2 lines."}
+]
 
-    Questions:
-    ${questions.map(q => `
-    ID: ${q.id}
-    Question: ${q.questionText}
-    Student's answer: ${studentAnswers[q.id] || "No answer provided"}
-    Sample answer: ${q.answer}
-    `).join('\n')}
+Questions:
+${questions.map(q => `
+ID: ${q.id}
+Question: ${q.questionText}
+Students answer: ${studentAnswers[q.id] || "No answer provided"}
+Sample answer: ${q.answer}
+`).join('\n')}
 
-    Scoring criteria:
-    1: Correct and demonstrates clear understanding. Does not need to match sample answer exactly.
-    0.5: Partially correct, missing key details.
-    0: Incorrect, irrelevant, or blank`
+Scoring criteria:
+1: Correct and demonstrates clear understanding. Does not need to match sample answer exactly.
+0.5: Partially correct, missing key details.
+0: Incorrect, irrelevant, or blank`

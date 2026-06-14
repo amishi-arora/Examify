@@ -7,8 +7,7 @@ import SignInPage from "./pages/SignInPage";
 
 function App() {
   const token = localStorage.getItem("token");
-  const [questions, setExamQuestions] = useState({});
-  const [examAnswers, setExamAnswers] = useState({});
+  const [examQuestions, setExamQuestions] = useState({});
 
   return (
     <BrowserRouter>
@@ -17,8 +16,8 @@ function App() {
           <SignInPage />
         } />
         <Route path="/home" element={token ? <HomePage setExamQuestions={setExamQuestions} /> : <Navigate to="/" />} />
-        <Route path="/exam" element={token && questions ?
-          <ExamPage studentAnswers={examAnswers} examQuestions={questions} setExamAnswers={setExamAnswers} /> :
+        <Route path="/exam" element={token && Object.keys(examQuestions).length ?
+          <ExamPage examQuestions={examQuestions} /> :
           <Navigate to="/home" />
         } />
         <Route path="/results" element={token ?

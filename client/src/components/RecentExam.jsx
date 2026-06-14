@@ -9,6 +9,8 @@ function getScoreColour(ratio) {
 export default function RecentExam({ id, title, questions, difficulty, date, results }) {
     const score = Object.values(results).reduce((sum, r) => sum + r.score, 0);
     const colour = getScoreColour(score / questions.length);
+    date = new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
     const navigate = useNavigate();
 
     function navigateToResultsPage() {

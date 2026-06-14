@@ -15,7 +15,7 @@ dotenv.config();
 
 // --- AI Setup --- 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: '	gemini-3.1-flash-lite' });
+const model = genAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite' });
 
 // --- Middleware ---
 const app = express();
@@ -58,6 +58,10 @@ function authenticateToken(req, res, next) {
 app.post('/api/upload', authenticateToken, upload.array('files'), async (req, res) => {
   try {
     const files = req.files;
+    if (!files || files.length === 0) {
+      return res.status(400).json({ error: 'No files uploaded' });
+    }
+
     let texts = await Promise.all(files.map(extractText));
     const text = texts.join('\n\n');
     res.json({ text });
@@ -71,8 +75,8 @@ app.post('/api/generate-exam', authenticateToken, async (req, res) => {
   try {
     const { text, examSettings } = req.body;
 
-    if (!text) {
-      return res.status(400).json({ error: 'No study material text provided' });
+    if (!text || !examSettings) {
+      return res.status(400).json({ error: 'Study material and exam settings must be provided' });
     }
     const result = await model.generateContent(prompts.generateExam(text, examSettings));
     const raw = result.response.text().replace(/```json\n?|```/g, '').trim();
@@ -89,6 +93,10 @@ app.post('/api/grade-exam', authenticateToken, async (req, res) => {
   try {
     const results = {};
     const { examQuestions, studentAnswers } = req.body;
+
+    if (!examQuestions || !studentAnswers) {
+      return res.status(400).json({ error: 'Exam questions and answers must be provided' });
+    }
     const mcQuestions = examQuestions.questions.filter(q => q.type === "Multiple choice");
     const shortQuestions = examQuestions.questions.filter(q => q.type === "Short answer");
 
@@ -198,15 +206,11 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/save-exam', authenticateToken, async (req, res) => {
   try {
     const { title, questions, difficulty, results, studentAnswers, insights } = req.body;
-    if (!title || !questions || !difficulty || !results || !studentAnswers) {
+    if (!title || !questions || !difficulty || !results || !studentAnswers || !insights) {
       return res.status(400).json({ error: 'All exam information is required' });
     }
     const examId = uuidv4();
-    const date = new Date().toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    const date = new Date().toISOString();
     const userId = req.user.userId;
     await db.send(new PutCommand({
       TableName: 'Exams',
@@ -228,22 +232,31 @@ app.get('/api/get-exams', authenticateToken, async (req, res) => {
       TableName: 'Exams',
       IndexName: 'userId-index',
       KeyConditionExpression: 'userId = :userId',
-      ExpressionAttributeValues: { ':userId': req.user.userId }
+      ExpressionAttributeValues: { ':userId': req.user.userId },
+      ScanIndexForward: false
     }));
     res.json(result.Items);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to get exams' });
+    res.status(500).json({ error: 'Failed to load recent exams' });
   }
 });
 
 app.get('/api/get-exam', authenticateToken, async (req, res) => {
   try {
     const examId = req.query.examId;
+    if (!examId) return res.status(400).json({ error: 'examId is required' });
     const result = await db.send(new GetCommand({
       TableName: 'Exams',
-      Key: { examId: examId }
+      Key: { examId }
     }));
+
+    if (!result.Item) return res.status(404).json({ error: 'Exam not found' });
+
+    // Prevent retrieving an exam the user does not have access to 
+    if (result.Item.userId !== req.user.userId) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
     res.json(result.Item);
   } catch (err) {
     console.error(err);
@@ -254,6 +267,10 @@ app.get('/api/get-exam', authenticateToken, async (req, res) => {
 app.post('/api/generate-insights', authenticateToken, async (req, res) => {
   try {
     const { examQuestions, studentAnswers, examResults } = req.body;
+
+    if (!examQuestions || !studentAnswers || !examResults) {
+      return res.status(400).json({ error: 'All exam information is required' });
+    }
 
     const result = await model.generateContent(prompts.generateInsights(examQuestions, examResults, studentAnswers));
     const raw = result.response.text().replace(/```json\n?|```/g, '').trim();
