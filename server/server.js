@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { PutCommand, GetCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import db from './db.js';
+import * as constants from "../client/constants.js";
 
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import express from 'express';
@@ -97,8 +98,8 @@ app.post('/api/grade-exam', authenticateToken, async (req, res) => {
     if (!examQuestions || !studentAnswers) {
       return res.status(400).json({ error: 'Exam questions and answers must be provided' });
     }
-    const mcQuestions = examQuestions.questions.filter(q => q.type === "Multiple choice");
-    const shortQuestions = examQuestions.questions.filter(q => q.type === "Short answer");
+    const mcQuestions = examQuestions.questions.filter(q => q.type === constants.QUESTION_TYPES.MC);
+    const shortQuestions = examQuestions.questions.filter(q => q.type === constants.QUESTION_TYPES.SHORT);
 
     // Grade MC locally
     for (const q of mcQuestions) {

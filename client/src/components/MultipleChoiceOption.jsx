@@ -1,9 +1,11 @@
+import * as constants from "../constants.js"
+
 export default function MultipleChoiceOption({ index, id, option, handleAnswer, isDisabled, isSelected, isCorrectAnswer }) {
     const cursorClass = isDisabled ? "cursor-default" : "cursor-pointer";
     const optionStyling = isSelected ?
         isCorrectAnswer ?
-            "border-green-600 bg-green-50 text-green-900" :
-            "border-red-600 bg-red-50 text-red-900"
+            constants.SCORE_COLORS.HIGH.full :
+            constants.SCORE_COLORS.LOW.full
         : "border-gray-300";
 
     return (

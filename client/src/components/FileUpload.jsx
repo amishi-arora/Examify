@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { uploadFiles, generateExam } from "../api.js";
+import * as constants from "../constants.js";
 import ErrorMessage from "./ErrorMessage.jsx";
 import ExamSettings from "./ExamSettings.jsx";
 
@@ -9,13 +10,7 @@ export default function FileUpload({ setExamQuestions }) {
   const [files, setFiles] = useState([]);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState(null);
-  const [examSettings, setExamSettings] = useState({
-    difficulty: "Medium",
-    multipleChoice: "5",
-    shortAnswer: "5",
-    focusTopics: "",
-    additionalInstructions: ""
-  });
+  const [examSettings, setExamSettings] = useState(constants.DEFAULT_EXAM_SETTINGS);
   const noQuestionTypesSelected =
     (examSettings.shortAnswer === "0" || examSettings.shortAnswer === "") &&
     (examSettings.multipleChoice === "0" || examSettings.multipleChoice === "");

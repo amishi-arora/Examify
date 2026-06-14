@@ -1,7 +1,9 @@
+import * as constants from "../constants.js"
+
 function getScoreFeedback(ratio) {
-    if (ratio <= 0.45) return { feedback: "Keep going! Take some time to review the material and try again", colour: "text-red-900" };
-    else if (ratio <= 0.65) return { feedback: "Good effort! There are some topics worth reviewing.", colour: "text-amber-600" };
-    else return { feedback: "Great work! You have a solid understanding of the material!", colour: "text-green-900" }
+    if (ratio <= 0.45) return { feedback: "Keep going! Take some time to review the material and try again", colour: constants.SCORE_COLORS.LOW.text };
+    else if (ratio <= 0.65) return { feedback: "Good effort! There are some topics worth reviewing.", colour: constants.SCORE_COLORS.MID.text };
+    else return { feedback: "Great work! You have a solid understanding of the material!", colour: constants.SCORE_COLORS.HIGH.text }
 }
 
 export default function ScoreBanner({ score, total }) {

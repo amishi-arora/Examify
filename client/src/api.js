@@ -1,3 +1,5 @@
+import { BASE_URL } from "./constants";
+
 export async function uploadFiles(files) {
   const formData = new FormData();
   files.forEach(f => formData.append("files", f));
@@ -14,7 +16,7 @@ export async function uploadFiles(files) {
 }
 
 export async function generateExam(text, examSettings) {
-  const res = await fetch("http://localhost:3001/api/generate-exam", {
+  const res = await fetch(`${BASE_URL}/api/generate-exam`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -30,7 +32,7 @@ export async function generateExam(text, examSettings) {
 }
 
 export async function gradeExam(studentAnswers, examQuestions) {
-  const res = await fetch("http://localhost:3001/api/grade-exam", {
+  const res = await fetch(`${BASE_URL}/api/grade-exam`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -46,7 +48,7 @@ export async function gradeExam(studentAnswers, examQuestions) {
 }
 
 export async function login(email, password) {
-  const res = await fetch("http://localhost:3001/api/login", {
+  const res = await fetch(`${BASE_URL}/api/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password })
@@ -59,7 +61,7 @@ export async function login(email, password) {
 }
 
 export async function register(name, email, password) {
-  const res = await fetch("http://localhost:3001/api/register", {
+  const res = await fetch(`${BASE_URL}/api/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, email, password })
@@ -72,7 +74,7 @@ export async function register(name, email, password) {
 }
 
 export async function saveExam(title, questions, difficulty, results, studentAnswers, insights) {
-  const res = await fetch("http://localhost:3001/api/save-exam", {
+  const res = await fetch(`${BASE_URL}/api/save-exam`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -89,7 +91,7 @@ export async function saveExam(title, questions, difficulty, results, studentAns
 }
 
 export async function getExams() {
-  const res = await fetch("http://localhost:3001/api/get-exams", {
+  const res = await fetch(`${BASE_URL}/api/get-exams`, {
     method: "GET",
     headers: {
       "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -103,7 +105,7 @@ export async function getExams() {
 }
 
 export async function generateInsights(examQuestions, studentAnswers, examResults) {
-  const res = await fetch("http://localhost:3001/api/generate-insights", {
+  const res = await fetch(`${BASE_URL}/api/generate-insights`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -119,7 +121,7 @@ export async function generateInsights(examQuestions, studentAnswers, examResult
 }
 
 export async function getExam(examId) {
-  const res = await fetch(`http://localhost:3001/api/get-exam?examId=${examId}`, {
+  const res = await fetch(`${BASE_URL}/api/get-exam?examId=${examId}`, {
     method: "GET",
     headers: {
       "Authorization": `Bearer ${localStorage.getItem("token")}`

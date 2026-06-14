@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
+import * as constants from "../constants.js";
 
 function getScoreColour(ratio) {
-    if (ratio <= 0.45) return "border-red-600 bg-red-50 text-red-900";
-    else if (ratio <= 0.65) return "border-amber-600 text-amber-800 bg-amber-50";
-    else return "border-green-600 bg-green-50 text-green-900";
+    if (ratio <= 0.45) return constants.SCORE_COLORS.LOW.full;
+    else if (ratio <= 0.65) return constants.SCORE_COLORS.MID.full;
+    else return constants.SCORE_COLORS.HIGH.full;
 }
 
 export default function RecentExam({ id, title, questions, difficulty, date, results }) {
