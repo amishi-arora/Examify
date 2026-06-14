@@ -6,6 +6,7 @@ import GradedExamQuestion from "../components/GradedExamQuestion"
 import ScoreBanner from "../components/ScoreBanner";
 import InsightsCard from "../components/InsightsCard";
 import ErrorMessage from "../components/ErrorMessage";
+import BackButton from "../components/BackButton";
 
 export default function ExamResultsPage() {
     const { state } = useLocation();
@@ -34,7 +35,10 @@ export default function ExamResultsPage() {
     const total = exam ? exam.questions.length : 0;
 
     return (
-        <main className="flex flex-col items-center min-h-screen bg-stone-50 p-15 gap-10">
+        <main className="flex flex-col min-h-screen items-center bg-stone-50 p-15 gap-10">
+            <div className="fixed top-4 left-4">
+                <BackButton to="/home" label="← Back to home"></BackButton>
+            </div>
             <Header title="Exam Results" />
 
             <ScoreBanner score={score} total={total} />

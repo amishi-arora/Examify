@@ -4,6 +4,7 @@ import { generateInsights, gradeExam, saveExam } from "../api.js";
 import ExamQuestion from "../components/ExamQuestion"
 import Header from "../components/Header"
 import ErrorMessage from "../components/ErrorMessage.jsx";
+import BackButton from "../components/BackButton.jsx";
 
 export default function ExamPage({ examQuestions }) {
     const navigate = useNavigate();
@@ -25,7 +26,8 @@ export default function ExamPage({ examQuestions }) {
             const { examId } = await saveExam(examQuestions.title, examQuestions.questions, examQuestions.difficulty, results, studentAnswers, insights);
 
             navigate("/results", {
-                state: { examId }
+                state: { examId },
+                replace: true
             });
         } catch (err) {
             console.log(err);
@@ -41,6 +43,10 @@ export default function ExamPage({ examQuestions }) {
     }
 
     return <main className="flex flex-col items-center min-h-screen bg-stone-50 p-15 gap-10">
+        <div className="fixed top-4 left-4">
+            <BackButton to="/home" label="← Back to home"></BackButton>
+        </div>
+
         <Header title={examQuestions.title} />
         {examQuestions.questions.map((q, i) => <ExamQuestion key={i} question={q} handleAnswer={handleAnswer} />)}
         <button disabled={grading} onClick={handleSubmit} className="cursor-pointer bg-blue-500 text-white py-3 px-9 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-300 disabled:cursor-default">
