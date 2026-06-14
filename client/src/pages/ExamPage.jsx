@@ -31,11 +31,9 @@ export default function ExamPage({ examQuestions }) {
             });
         } catch (err) {
             console.log(err);
-            setError(err.message);
-        } finally {
             setGrading(false);
+            setError(err.message);
         }
-
     }
 
     function handleAnswer(question, answer) {
@@ -49,8 +47,8 @@ export default function ExamPage({ examQuestions }) {
 
         <Header title={examQuestions.title} />
         {examQuestions.questions.map((q, i) => <ExamQuestion key={i} question={q} handleAnswer={handleAnswer} />)}
-        <button disabled={grading} onClick={handleSubmit} className="cursor-pointer bg-blue-500 text-white py-3 px-9 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-300 disabled:cursor-default">
-            {grading ? "Grading..." : "Submit Exam"}
+        <button disabled={grading} onClick={handleSubmit} className="cursor-pointer bg-blue-500 text-white py-3 px-9 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-300 disabled:cursor-default flex items-center justify-center w-48">
+            {grading ? <span className="mx-auto animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" /> : "Submit Exam"}
         </button>
 
         {/* Error message in case exam grading fails */}

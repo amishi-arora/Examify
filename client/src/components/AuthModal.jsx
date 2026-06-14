@@ -6,6 +6,7 @@ import ErrorMessage from "./ErrorMessage.jsx";
 export default function AuthModal() {
     const [loginMode, setLoginMode] = useState(true);
     const [error, setError] = useState(null)
+    const [loggingIn, setLoggingIn] = useState(false);
     const navigate = useNavigate();
 
     async function handleSubmit(event) {
@@ -13,6 +14,7 @@ export default function AuthModal() {
         const fd = new FormData(event.target);
         setError(null);
         try {
+            setLoggingIn(true);
             if (loginMode) {
                 const { token, name } = await login(fd.get("email"), fd.get("password"));
                 localStorage.setItem("token", token);
@@ -30,6 +32,7 @@ export default function AuthModal() {
         } catch (err) {
             console.error(err);
             setError(err.message);
+            setLoggingIn(false);
         }
     }
 
@@ -82,7 +85,9 @@ export default function AuthModal() {
 
                 {error && <ErrorMessage message={error} />}
 
-                <button type="submit" className="cursor-pointer bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 transition">{loginMode ? "Log in" : "Create account"}</button>
+                <button disabled={loggingIn} type="submit" className="cursor-pointer bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 transition flex items-center justify-center  disabled:bg-gray-300 disabled:cursor-default">{loginMode ?
+                    loggingIn ? <span className="mx-auto animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
+                        : loggingIn ? <span className="mx-auto animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" /> : "Log in" : "Create account"}</button>
 
                 <p className="text-center text-sm">{loginMode ? "Don't have an account?" : "Already have an account?"} <button className="text-blue-600 cursor-pointer" onClick={() => { setError(""); setLoginMode((prev) => !prev); }}>
                     {loginMode ? "Sign up" : "Log in"}

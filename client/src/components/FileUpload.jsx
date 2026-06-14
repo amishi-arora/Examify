@@ -30,9 +30,8 @@ export default function FileUpload({ setExamQuestions }) {
       navigate("/exam");
     } catch (err) {
       console.log(err);
-      setError(err.message);
-    } finally {
       setGenerating(false);
+      setError(err.message);
     }
   };
 
@@ -89,8 +88,8 @@ export default function FileUpload({ setExamQuestions }) {
       <button
         onClick={handleGenerate}
         disabled={files.length === 0 || generating || noQuestionTypesSelected}
-        className="cursor-pointer mt-4 w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-300 disabled:cursor-default">
-        {generating ? "Generating..." : "Generate Practice Exam"}
+        className="cursor-pointer mt-4 w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 flex items-center justify-center transition disabled:bg-gray-300 disabled:cursor-default">
+        {generating ? <span className="mx-auto animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" /> : "Generate Practice Exam"}
       </button>
     </div>
   );

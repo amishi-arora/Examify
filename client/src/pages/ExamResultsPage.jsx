@@ -41,7 +41,9 @@ export default function ExamResultsPage() {
             </div>
             <Header title="Exam Results" />
 
-            <ScoreBanner score={score} total={total} />
+            {(!exam && !error) && <span className="animate-spin rounded-full h-20 w-20 border-4 border-blue-500 border-t-transparent" />}
+
+            {exam && <ScoreBanner score={score} total={total} />}
 
             {exam && <InsightsCard insights={exam.insights} />}
 
