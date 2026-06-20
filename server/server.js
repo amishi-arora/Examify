@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { PutCommand, GetCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import db from './db.js';
-import * as constants from "../client/constants.js";
+import * as constants from "../client/src/constants.js";
 
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import express from 'express';
@@ -48,8 +48,10 @@ const extractText = async (file) => {
 function authenticateToken(req, res, next) {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ error: "Unauthorized" });
+
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ error: "Invalid token" });
+    if (err) res.status(403).json({ error: "Invalid token" });
+
     req.user = user;
     next();
   });

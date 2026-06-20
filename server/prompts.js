@@ -1,4 +1,4 @@
-import * as constants from "../client/constants.js"
+import * as constants from "../client/src/constants.js"
 
 export const generateExam = (text, examSettings) => `You are an exam generator. Based on the following study material, generate an exam with exactly ${examSettings.multipleChoice} multiple choice questions and ${examSettings.shortAnswer} short answer questions.
 Make the exam of ${examSettings.difficulty} difficulty level. If mixed, distribute questions evenly across easy, medium, and hard. 
