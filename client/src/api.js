@@ -9,6 +9,11 @@ export async function uploadFiles(files) {
     body: formData
   });
   if (!res.ok) {
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+      window.location.href = '/'
+    }
     const data = await res.json();
     throw new Error(data.error);
   }
@@ -25,6 +30,11 @@ export async function generateExam(text, examSettings) {
     body: JSON.stringify({ text, examSettings })
   });
   if (!res.ok) {
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+      window.location.href = '/'
+    }
     const data = await res.json();
     throw new Error(data.error);
   }
@@ -41,6 +51,11 @@ export async function gradeExam(studentAnswers, examQuestions) {
     body: JSON.stringify({ studentAnswers, examQuestions })
   });
   if (!res.ok) {
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+      window.location.href = '/'
+    }
     const data = await res.json();
     throw new Error(data.error);
   }
@@ -54,6 +69,11 @@ export async function login(email, password) {
     body: JSON.stringify({ email, password })
   });
   if (!res.ok) {
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+      window.location.href = '/'
+    }
     const data = await res.json();
     throw new Error(data.error);
   }
@@ -67,6 +87,11 @@ export async function register(name, email, password) {
     body: JSON.stringify({ name, email, password })
   });
   if (!res.ok) {
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+      window.location.href = '/'
+    }
     const data = await res.json();
     throw new Error(data.error);
   }
@@ -83,6 +108,11 @@ export async function saveExam(title, questions, difficulty, results, studentAns
     body: JSON.stringify({ title, questions, difficulty, results, studentAnswers, insights })
   });
   if (!res.ok) {
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+      window.location.href = '/'
+    }
     const data = await res.json();
     throw new Error(data.error);
   }
@@ -98,6 +128,11 @@ export async function getExams() {
     },
   })
   if (!res.ok) {
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+      window.location.href = '/'
+    }
     const data = await res.json();
     throw new Error(data.error);
   }
@@ -114,6 +149,11 @@ export async function generateInsights(examQuestions, studentAnswers, examResult
     body: JSON.stringify({ examQuestions, studentAnswers, examResults })
   })
   if (!res.ok) {
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+      window.location.href = '/'
+    }
     const data = await res.json();
     throw new Error(data.error);
   }
@@ -128,6 +168,11 @@ export async function getExam(examId) {
     },
   })
   if (!res.ok) {
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+      window.location.href = '/'
+    }
     const data = await res.json();
     throw new Error(data.error);
   }
