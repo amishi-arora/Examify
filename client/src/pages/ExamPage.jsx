@@ -5,12 +5,14 @@ import ExamQuestion from "../components/ExamQuestion"
 import Header from "../components/Header"
 import ErrorMessage from "../components/ErrorMessage.jsx";
 import BackButton from "../components/BackButton.jsx";
+import ProgressBar from "../components/ProgressBar.jsx";
 
 export default function ExamPage({ examQuestions }) {
     const navigate = useNavigate();
     const [grading, setGrading] = useState(false);
     const [error, setError] = useState(null);
     const [studentAnswers, setStudentAnswers] = useState({});
+    const numberOfAnswers = (Object.values(studentAnswers).filter(x => x != "" && x != null)).length;
 
     // Redirect to home on refresh 
     if (!Object.keys(examQuestions).length) {
@@ -45,9 +47,14 @@ export default function ExamPage({ examQuestions }) {
             <BackButton to="/home" label="← Back to home"></BackButton>
         </div>
 
+        <div className="fixed top-20 left-4">
+            <ProgressBar questions={examQuestions.questions.length} answered={numberOfAnswers} />
+        </div>
+
         <Header title={examQuestions.title} />
+
         {examQuestions.questions.map((q, i) => <ExamQuestion key={i} question={q} handleAnswer={handleAnswer} />)}
-        <button disabled={grading} onClick={handleSubmit} className="cursor-pointer bg-blue-500 text-white py-3 px-9 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-300 disabled:cursor-default flex items-center justify-center w-48">
+        < button disabled={grading} onClick={handleSubmit} className="cursor-pointer bg-blue-500 text-white py-3 px-9 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-300 disabled:cursor-default flex items-center justify-center w-48">
             {grading ? <span className="mx-auto animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" /> : "Submit Exam"}
         </button>
 
