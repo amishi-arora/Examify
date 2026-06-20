@@ -137,7 +137,7 @@ app.post('/api/register', async (req, res) => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-      return res.status(400).json({ error: 'All fields are required' });
+      return res.status(400).json({ error: 'All registration fields are required' });
     }
 
     // Check if user already exists
@@ -175,7 +175,7 @@ app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: 'All fields are required' });
+      return res.status(400).json({ error: 'All login fields are required' });
     }
 
     // Find user by email

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getExams } from "../api.js";
+import BackButton from "../components/BackButton.jsx";
 import Header from "../components/Header";
 import FileUpload from "../components/FileUpload"
 import RecentExams from "../components/RecentExams";
@@ -26,6 +27,9 @@ export default function HomePage({ setExamQuestions }) {
 
     return (
         <main className="flex flex-col min-h-screen bg-stone-50 p-15 justify-center items-center gap-10">
+            <div className="fixed top-4 left-4">
+                <BackButton to="/" label="Logout"></BackButton>
+            </div>
             <Header title={greeting} subtitle="Are you ready to prepare for your next exam?" />
             <FileUpload setExamQuestions={setExamQuestions} />
             {error
