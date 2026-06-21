@@ -50,7 +50,7 @@ export default function ExamPage({ examQuestions }) {
             <BackButton to="/home" label="← Back to home"></BackButton>
         </div>
 
-        <div className="fixed top-20 left-4">
+        <div className="fixed top-80 left-20">
             <ProgressBar questions={examQuestions.questions.length} answered={numberOfAnswers} />
         </div>
 

@@ -1,41 +1,14 @@
 export default function ProgressBar({ questions, answered }) {
-    const size = 150;
-    const stroke = 7;
-    const radius = (size - stroke) / 2;
-    const circumference = 2 * Math.PI * radius;
-    const progress = answered / questions
-    const offset = circumference - (progress) * circumference;
     return (
-        <div className="flex items-center justify-center">
-            <svg
-                width={size}
-                height={size}
-                className="transform -rotate-90"
-            >
-                <circle
-                    stroke="#e5e7eb"
-                    fill="transparent"
-                    strokeWidth={stroke}
-                    r={radius}
-                    cx={size / 2}
-                    cy={size / 2}
-                />
-                <circle
-                    stroke="blue"
-                    fill="transparent"
-                    strokeWidth={stroke}
-                    strokeLinecap="round"
-                    strokeDasharray={circumference}
-                    strokeDashoffset={offset}
-                    r={radius}
-                    cx={size / 2}
-                    cy={size / 2}
-                    className="transition-all duration-300 ease-out"
-                />
-            </svg>
-            <p className="text-sm text-center absolute font-semibold text-gray-700">
-                {answered} / {questions} completed
-            </p>
+        <div className="flex flex-col gap-3 bg-white p-8 shadow-md rounded-2xl w-72 justify-center items-center">
+            <div className="flex w-full flex-row justify-between text-sm">
+                <p>Progress</p>
+                <p className="font-bold">{answered} / {questions}</p>
+            </div>
+            <div className="bg-gray-200 w-full h-2 rounded-full">
+                <div className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${(answered / questions) * 100}%` }} />
+            </div>
         </div>
 
     )
