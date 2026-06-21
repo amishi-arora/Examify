@@ -31,5 +31,6 @@ export const DEFAULT_EXAM_SETTINGS = {
     multipleChoice: "5",
     shortAnswer: "5",
     focusTopics: "",
-    additionalInstructions: ""
+    additionalInstructions: "",
+    time: "0"
 }

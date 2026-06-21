@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { generateInsights, gradeExam, saveExam } from "../api.js";
 import ExamQuestion from "../components/ExamQuestion"
@@ -6,6 +6,8 @@ import Header from "../components/Header"
 import ErrorMessage from "../components/ErrorMessage.jsx";
 import BackButton from "../components/BackButton.jsx";
 import ProgressBar from "../components/ProgressBar.jsx";
+import CountDown from "../components/CountDown.jsx";
+import ExamSettings from "../components/ExamSettings.jsx";
 
 export default function ExamPage({ examQuestions }) {
     const navigate = useNavigate();
@@ -13,6 +15,7 @@ export default function ExamPage({ examQuestions }) {
     const [error, setError] = useState(null);
     const [studentAnswers, setStudentAnswers] = useState({});
     const numberOfAnswers = (Object.values(studentAnswers).filter(x => x != "" && x != null)).length;
+
 
     // Redirect to home on refresh 
     if (!Object.keys(examQuestions).length) {
@@ -51,10 +54,14 @@ export default function ExamPage({ examQuestions }) {
             <ProgressBar questions={examQuestions.questions.length} answered={numberOfAnswers} />
         </div>
 
+        <div className="fixed top-20 left-20">
+            <CountDown time={examQuestions.time} onTimeout={handleSubmit} />
+        </div>
+
         <Header title={examQuestions.title} />
 
         {examQuestions.questions.map((q, i) => <ExamQuestion key={i} question={q} handleAnswer={handleAnswer} />)}
-        < button disabled={grading} onClick={handleSubmit} className="cursor-pointer bg-blue-500 text-white py-3 px-9 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-300 disabled:cursor-default flex items-center justify-center w-48">
+        <button disabled={grading} onClick={handleSubmit} className="cursor-pointer bg-blue-500 text-white py-3 px-9 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-300 disabled:cursor-default flex items-center justify-center w-48">
             {grading ? <span className="mx-auto animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" /> : "Submit Exam"}
         </button>
 

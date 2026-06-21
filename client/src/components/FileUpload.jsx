@@ -26,6 +26,7 @@ export default function FileUpload({ setExamQuestions }) {
     try {
       const { text } = await uploadFiles(files);
       const examData = await generateExam(text, examSettings);
+      examData.time = examSettings.time;
       setExamQuestions(examData);
       navigate("/exam");
     } catch (err) {

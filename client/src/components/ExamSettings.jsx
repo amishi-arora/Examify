@@ -54,6 +54,25 @@ export default function ExamSettings({ settings, updateSettings, noQuestionTypes
             />
         </div>
 
+        <p>Timed exam</p>
+        <div className="flex items-center justify-between p-1 rounded-lg border-gray-300 border">
+            <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
+                <input onChange={(e) => updateSettings("time", e.target.checked ? "30" : "0")} checked={settings.time !== '0' && settings.time !== ""} type="checkbox" className="accent-blue-600" />
+                Timed
+            </label>
+            <div className="flex items-center gap-2">
+                <input
+                    onChange={(e) => updateSettings("time", e.target.value)}
+                    type="number"
+                    min="0"
+                    max="10"
+                    value={settings.time}
+                    className="w-min p-0 text-center focus:border-blue-400 border border-gray-300 rounded-lg p-1"
+                />
+                <span>mins</span>
+            </div>
+        </div>
+
         {/* Error message if no question types are selected */}
         {noQuestionTypesSelected && <ErrorMessage message="Please select at least one question type" />}
 
