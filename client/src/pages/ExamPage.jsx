@@ -54,9 +54,11 @@ export default function ExamPage({ examQuestions }) {
             <ProgressBar questions={examQuestions.questions.length} answered={numberOfAnswers} />
         </div>
 
-        <div className="fixed top-20 left-20">
-            <CountDown time={examQuestions.time} onTimeout={handleSubmit} />
-        </div>
+        {examQuestions.time != null && examQuestions.time != 0 &&
+            <div className="fixed top-20 left-20">
+                <CountDown time={examQuestions.time} onTimeout={handleSubmit} />
+            </div>
+        }
 
         <Header title={examQuestions.title} />
 
