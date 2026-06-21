@@ -5,7 +5,7 @@ export default function ExamQuestion({ question, handleAnswer }) {
     const tag = `Q${question.id} • ${question.type}`
     const tagColor = question.type === constants.QUESTION_TYPES.MCƒ ? "bg-blue-100 text-blue-800" : "bg-purple-100 text-purple-800";
 
-    return <div className="flex flex-col gap-3 bg-white p-8 shadow-md rounded-2xl w-2/3 min-[1500px]:w-1/2">
+    return <div className="flex flex-col gap-3 bg-white p-8 shadow-md rounded-2xl w-1/2">
         <span className={`text-xs p-1 w-fit rounded-xl transition duration-150 ease hover:scale-102 ${tagColor}`}>{tag}</span>
         <p className="font-bold">{question.questionText}</p>
 

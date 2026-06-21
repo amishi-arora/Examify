@@ -1,6 +1,6 @@
 export default function ProgressBar({ questions, answered }) {
     return (
-        <div className="flex flex-col gap-3 bg-white p-8 shadow-md rounded-2xl w-72 justify-center items-center">
+        <div className="flex flex-col gap-3 w-full justify-center items-center">
             <div className="flex w-full flex-row justify-between text-sm">
                 <p>Progress</p>
                 <p className="font-bold">{answered} / {questions}</p>

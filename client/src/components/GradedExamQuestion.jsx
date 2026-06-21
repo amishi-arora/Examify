@@ -15,7 +15,7 @@ export default function GradedExamQuestion({ question, studentAnswer, result }) 
     const tag = `Q${question.id} • ${question.type}`
     const tagColor = question.type === constants.QUESTION_TYPES.MC ? "bg-blue-100 text-blue-800" : "bg-purple-100 text-purple-800";
 
-    return <div className="flex flex-col gap-3 bg-white p-8 shadow-md rounded-2xl w-2/3 min-[1500px]:w-1/2">
+    return <div className="flex flex-col gap-3 bg-white p-8 shadow-md rounded-2xl w-1/2">
         <div className="flex justify-between items-center">
             <span className={`text-xs p-1 w-fit rounded-xl transition duration-150 ease hover:scale-102 ${tagColor}`}>{tag}</span>
             <span className={`${getScoreColor(result.score)} text-xs p-2 border-1 rounded-xl ease hover:scale-102`}>{`${result.score}/1`}</span>

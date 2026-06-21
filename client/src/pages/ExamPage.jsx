@@ -49,16 +49,12 @@ export default function ExamPage({ examQuestions }) {
         <div className="fixed top-4 left-4">
             <BackButton to="/home" label="← Back to home"></BackButton>
         </div>
-
-        <div className="fixed top-80 left-20">
+        <div className="fixed top-1/4 left-10 flex flex-col gap-5 w-1/6 bg-white p-8 shadow-md rounded-2xl">
+            {examQuestions.time != 0 && examQuestions.time != null && <CountDown time={examQuestions.time} onTimeout={handleSubmit} />}
+            {examQuestions.time != 0 && examQuestions.time != null && <hr className="border-gray-400" />}
             <ProgressBar questions={examQuestions.questions.length} answered={numberOfAnswers} />
         </div>
 
-        {examQuestions.time != null && examQuestions.time != 0 &&
-            <div className="fixed top-20 left-20">
-                <CountDown time={examQuestions.time} onTimeout={handleSubmit} />
-            </div>
-        }
 
         <Header title={examQuestions.title} />
 

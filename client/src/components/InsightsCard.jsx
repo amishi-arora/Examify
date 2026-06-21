@@ -1,5 +1,5 @@
 export default function InsightsCard({ insights }) {
-    return <div className="flex flex-col gap-3 bg-white p-6 shadow-md rounded-2xl w-2/3 min-[1500px]:w-1/2">
+    return <div className="flex flex-col gap-3 bg-white p-6 shadow-md rounded-2xl w-1/2">
         <p className="tracking-[0.05em] uppercase text-stone-400 text-sm">✨ AI Insights</p>
 
         <p className="text-stone-800">{insights.feedback}</p>
