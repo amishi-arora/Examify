@@ -42,12 +42,12 @@ export default function ExamResultsPage() {
             <div className="fixed top-4 flex w-[98%] justify-between items-start">
                 <BackButton to="/home" label="← Back to home"></BackButton>
 
-                <div className="flex flex-col items-start gap-2 text-sm">
+                <div className="flex flex-col items-start gap-2 text-xs">
                     <PDFDownloadLink
                         document={<ExamResultsPDF examData={exam} />}
                         fileName="exam-results.pdf">
                         {({ loading }) => (
-                            <button className="w-40 cursor-pointer p-1 bg-white border-1 rounded-xl ease hover:scale-102 border-stone-400 text-stone-800 shadow-md">
+                            <button className="w-35 cursor-pointer p-1 bg-white border-1 rounded-xl ease hover:scale-102 border-stone-400 text-stone-800 shadow-md">
                                 Download Results
                             </button>
                         )}
@@ -56,14 +56,16 @@ export default function ExamResultsPage() {
                         document={<BlankExamPdf examData={exam} />}
                         fileName="blank-exam.pdf">
                         {({ loading }) => (
-                            <button className="w-40 cursor-pointer p-1 bg-white border-1 rounded-xl ease hover:scale-102 border-stone-400 text-stone-800 shadow-md">
+                            <button className="w-35 cursor-pointer p-1 bg-white border-1 rounded-xl ease hover:scale-102 border-stone-400 text-stone-800 shadow-md">
                                 Download Blank Exam
                             </button>
                         )}
                     </PDFDownloadLink>
                 </div>
             </div>
-            {exam && <Header title={`Exam Results: ${exam.title}`}/>}
+            <div className="w-[75%]">
+                {exam && <Header title={`Exam Results: ${exam.title}`} />}
+            </div>
 
             {(!exam && !error) && <span className="animate-spin rounded-full h-20 w-20 border-4 border-blue-500 border-t-transparent" />}
 
