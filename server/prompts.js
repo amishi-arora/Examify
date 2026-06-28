@@ -43,7 +43,7 @@ Return ONLY a JSON object in this exact format, no markdown, no backticks, no ex
 }
 
 Guidelines: 
-- Topics should be specific concepts (e.g. "mitosis, "ATP production"), not broad subjects
+- Topics should be specific concepts (e.g. "mitosis, "ATP production"), not broad subjects. Each topic should consist of a maximum of 3 words. 
 - A score of 1 indicates the student understood that topic well
 - A score of 0.5 indicates partial understanding
 - A score of 0 indicates the student struggled with that topic
