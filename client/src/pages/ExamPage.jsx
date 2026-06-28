@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { generateInsights, gradeExam, saveExam } from "../api.js";
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import ExamQuestion from "../components/ExamQuestion"
 import Header from "../components/Header"
 import ErrorMessage from "../components/ErrorMessage.jsx";
 import BackButton from "../components/BackButton.jsx";
 import ProgressBar from "../components/ProgressBar.jsx";
 import CountDown from "../components/CountDown.jsx";
-import ExamSettings from "../components/ExamSettings.jsx";
+import BlankExamPdf from "../components/BlankExamPdf";
 
 export default function ExamPage({ examQuestions }) {
     const navigate = useNavigate();
@@ -46,8 +47,18 @@ export default function ExamPage({ examQuestions }) {
     }
 
     return <main className="flex flex-col items-center min-h-screen bg-stone-50 p-15 gap-10">
-        <div className="fixed top-4 left-4">
+        <div className="fixed top-4 flex w-[98%] justify-between items-start">
             <BackButton to="/home" label="← Back to home"></BackButton>
+
+            <PDFDownloadLink
+                document={<BlankExamPdf examData={examQuestions} />}
+                fileName="exam-questions.pdf">
+                {({ loading }) => (
+                    <button className="w-40 cursor-pointer p-1 bg-white border-1 rounded-xl ease hover:scale-102 border-stone-400 text-stone-800 text-sm shadow-md">
+                        Download Blank Exam
+                    </button>
+                )}
+            </PDFDownloadLink>
         </div>
         <div className="fixed top-1/4 left-10 flex flex-col gap-5 w-1/6 bg-white p-8 shadow-md rounded-2xl">
             {examQuestions.time != 0 && examQuestions.time != null && <CountDown time={examQuestions.time} onTimeout={handleSubmit} />}

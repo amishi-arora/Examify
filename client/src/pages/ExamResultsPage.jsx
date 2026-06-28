@@ -1,12 +1,15 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getExam } from "../api";
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import Header from "../components/Header"
 import GradedExamQuestion from "../components/GradedExamQuestion"
 import ScoreBanner from "../components/ScoreBanner";
 import InsightsCard from "../components/InsightsCard";
 import ErrorMessage from "../components/ErrorMessage";
 import BackButton from "../components/BackButton";
+import ExamResultsPDF from "../components/ExamResultsPdf";
+import BlankExamPdf from "../components/BlankExamPdf";
 
 export default function ExamResultsPage() {
     const { state } = useLocation();
@@ -36,8 +39,29 @@ export default function ExamResultsPage() {
 
     return (
         <main className="flex flex-col min-h-screen items-center bg-stone-50 p-15 gap-10">
-            <div className="fixed top-4 left-4">
+            <div className="fixed top-4 flex w-[98%] justify-between items-start">
                 <BackButton to="/home" label="← Back to home"></BackButton>
+
+                <div className="flex flex-col items-start gap-2 text-sm">
+                    <PDFDownloadLink
+                        document={<ExamResultsPDF examData={exam} />}
+                        fileName="exam-results.pdf">
+                        {({ loading }) => (
+                            <button className="w-40 cursor-pointer p-1 bg-white border-1 rounded-xl ease hover:scale-102 border-stone-400 text-stone-800 shadow-md">
+                                Download Results
+                            </button>
+                        )}
+                    </PDFDownloadLink>
+                    <PDFDownloadLink
+                        document={<BlankExamPdf examData={exam} />}
+                        fileName="exam-questions.pdf">
+                        {({ loading }) => (
+                            <button className="w-40 cursor-pointer p-1 bg-white border-1 rounded-xl ease hover:scale-102 border-stone-400 text-stone-800 shadow-md">
+                                Download Blank Exam
+                            </button>
+                        )}
+                    </PDFDownloadLink>
+                </div>
             </div>
             <Header title="Exam Results" />
 
