@@ -11,8 +11,8 @@ export const SCORE_COLORS = {
         border: "border-green-600"
     },
     MID: {
-        full: "border-amber-600 text-amber-800 bg-amber-50",
-        text: "text-amber-800",
+        full: "border-amber-600 text-amber-600 bg-amber-50",
+        text: "text-amber-600",
         bg: "bg-amber-50",
         border: "border-amber-600"
     },

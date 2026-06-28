@@ -52,7 +52,7 @@ export default function ExamPage({ examQuestions }) {
 
             <PDFDownloadLink
                 document={<BlankExamPdf examData={examQuestions} />}
-                fileName="exam-questions.pdf">
+                fileName="blank-exam.pdf">
                 {({ loading }) => (
                     <button className="w-40 cursor-pointer p-1 bg-white border-1 rounded-xl ease hover:scale-102 border-stone-400 text-stone-800 text-sm shadow-md">
                         Download Blank Exam

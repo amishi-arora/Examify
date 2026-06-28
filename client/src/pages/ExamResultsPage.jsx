@@ -54,7 +54,7 @@ export default function ExamResultsPage() {
                     </PDFDownloadLink>
                     <PDFDownloadLink
                         document={<BlankExamPdf examData={exam} />}
-                        fileName="exam-questions.pdf">
+                        fileName="blank-exam.pdf">
                         {({ loading }) => (
                             <button className="w-40 cursor-pointer p-1 bg-white border-1 rounded-xl ease hover:scale-102 border-stone-400 text-stone-800 shadow-md">
                                 Download Blank Exam
@@ -63,7 +63,7 @@ export default function ExamResultsPage() {
                     </PDFDownloadLink>
                 </div>
             </div>
-            <Header title="Exam Results" />
+            {exam && <Header title={`Exam Results: ${exam.title}`}/>}
 
             {(!exam && !error) && <span className="animate-spin rounded-full h-20 w-20 border-4 border-blue-500 border-t-transparent" />}
 

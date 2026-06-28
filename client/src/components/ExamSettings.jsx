@@ -53,6 +53,9 @@ export default function ExamSettings({ settings, updateSettings, noQuestionTypes
                 className="border border-gray-300 rounded-lg w-14 p-1 text-center focus:border-blue-400"
             />
         </div>
+        
+        {/* Error message if no question types are selected */}
+        {noQuestionTypesSelected && <ErrorMessage message="Please select at least one question type" />}
 
         <p>Timed exam</p>
         <div className="flex items-center justify-between p-1 rounded-lg border-gray-300 border">
@@ -72,9 +75,6 @@ export default function ExamSettings({ settings, updateSettings, noQuestionTypes
                 <span>mins</span>
             </div>
         </div>
-
-        {/* Error message if no question types are selected */}
-        {noQuestionTypesSelected && <ErrorMessage message="Please select at least one question type" />}
 
         {/* Exam focus topics */}
         <label className="flex flex-col gap-1">Focus topics (optional)
