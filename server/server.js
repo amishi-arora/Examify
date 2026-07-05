@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-dotenv.config();
 import { v4 as uuidv4 } from 'uuid';
 import { PutCommand, GetCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -13,8 +12,8 @@ import * as constants from "../client/src/constants.js";
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import express from 'express';
 import cors from 'cors';
-import multer from 'multer';
 import * as prompts from "./prompts.js";
+dotenv.config();
 
 
 // --- AI Setup --- 
@@ -27,7 +26,29 @@ app.use(cors());
 app.use(express.json());
 
 // --- Text Extraction Helpers --- 
-const upload = multer({ storage: multer.memoryStorage() });
+async function getTextFromS3File(key, fileType) {
+  const response = await s3.send(new GetObjectCommand({
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: key,
+  }));
+
+  const buffer = await streamToBuffer(response.Body);
+  if (fileType === "application/pdf") {
+    return extractPdfText(buffer);
+  }
+  return buffer.toString("utf-8");
+}
+
+async function streamToBuffer(stream) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    stream.on("data", (chunk) => chunks.push(chunk));
+    stream.on("error", reject);
+    stream.on("end", () =>
+      resolve(Buffer.concat(chunks))
+    );
+  });
+}
 
 async function extractPdfText(buffer) {
   const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buffer) });
@@ -41,30 +62,6 @@ async function extractPdfText(buffer) {
   );
   return pageTexts.join('\n');
 };
-
-async function streamToBuffer(stream) {
-  return new Promise((resolve, reject) => {
-    const chunks = [];
-    stream.on("data", (chunk) => chunks.push(chunk));
-    stream.on("error", reject);
-    stream.on("end", () =>
-      resolve(Buffer.concat(chunks))
-    );
-  });
-}
-
-async function getTextFromS3File(key, fileType) {
-  const response = await s3.send(new GetObjectCommand({
-    Bucket: process.env.AWS_BUCKET_NAME,
-    Key: key,
-  }));
-
-  const buffer = await streamToBuffer(response.Body);
-  if (fileType === "application/pdf") {
-    return extractPdfText(buffer);
-  }
-  return buffer.toString("utf-8");
-}
 
 // --- JWT Middleware --- 
 function authenticateToken(req, res, next) {
@@ -90,7 +87,6 @@ app.post("/api/generate-exam", authenticateToken, async (req, res) => {
 
     let allText = "";
 
-
     for (const file of files) {
       const text = await getTextFromS3File(file.key, file.fileType);
       allText += text + "\n\n";
@@ -100,13 +96,12 @@ app.post("/api/generate-exam", authenticateToken, async (req, res) => {
       prompts.generateExam(allText, examSettings)
     );
 
-    const raw = result.response.text().replace(/```json\n?|```/g, "").trim();
-    const exam = JSON.parse(raw);
-    res.json(exam);
+    const exam = result.response.text().replace(/```json\n?|```/g, "").trim();
+    res.json(JSON.parse(exam));
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to generate exam from S3" });
+    res.status(500).json({ error: "Failed to generate exam" });
   }
 });
 
