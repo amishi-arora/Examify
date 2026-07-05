@@ -1,7 +1,7 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
-import dotenv from 'dotenv';
-dotenv.config(); 
 
 const client = new DynamoDBClient({
   region: process.env.AWS_REGION,
@@ -11,6 +11,6 @@ const client = new DynamoDBClient({
   },
 });
 
-const db = DynamoDBDocumentClient.from(client);
+export const db = DynamoDBDocumentClient.from(client);
 
 export default db;

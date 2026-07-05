@@ -1,43 +1,23 @@
 import { BASE_URL } from "./constants";
 
-export async function uploadFiles(files) {
-  const formData = new FormData();
-  files.forEach(f => formData.append("files", f));
-  const res = await fetch("http://localhost:3001/api/upload", {
-    method: "POST",
-    headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
-    body: formData
-  });
-  if (!res.ok) {
-    if (res.status === 401 || res.status === 403) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("name");
-      window.location.href = '/'
-    }
-    const data = await res.json();
-    throw new Error(data.error);
-  }
-  return res.json();
-}
-
-export async function generateExam(text, examSettings) {
+export async function generateExam(files, examSettings) {
   const res = await fetch(`${BASE_URL}/api/generate-exam`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${localStorage.getItem("token")}`
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
-    body: JSON.stringify({ text, examSettings })
+    body: JSON.stringify({
+      files,
+      examSettings,
+    }),
   });
+
   if (!res.ok) {
-    if (res.status === 401 || res.status === 403) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("name");
-      window.location.href = '/'
-    }
     const data = await res.json();
     throw new Error(data.error);
   }
+
   return res.json();
 }
 
@@ -177,4 +157,27 @@ export async function getExam(examId) {
     throw new Error(data.error);
   }
   return res.json();
+}
+
+export async function getUploadUrl(file) {
+  const res = await fetch(`${BASE_URL}/api/s3-upload-url`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    },
+    body: JSON.stringify({
+      fileName: file.name,
+      fileType: file.type,
+    }),
+  });
+
+  return res.json();
+}
+
+export async function uploadToS3(file, uploadUrl) {
+  await fetch(uploadUrl, {
+    method: "PUT",
+    body: file,
+  })
 }

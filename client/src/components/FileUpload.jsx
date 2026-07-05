@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { uploadFiles, generateExam } from "../api.js";
+import { getUploadUrl, uploadToS3, generateExamFromS3 } from "../api.js";
 import * as constants from "../constants.js";
 import ErrorMessage from "./ErrorMessage.jsx";
 import ExamSettings from "./ExamSettings.jsx";
@@ -24,8 +24,17 @@ export default function FileUpload({ setExamQuestions }) {
     setGenerating(true);
     setError(null);
     try {
-      const { text } = await uploadFiles(files);
-      const examData = await generateExam(text, examSettings);
+      const uploadedFiles = [];
+
+      for (const file of files) {
+        const { uploadUrl, key } = await getUploadUrl(file);
+        await uploadToS3(file, uploadUrl);
+        uploadedFiles.push({
+          key,
+          fileType: file.type
+        })
+      }
+      const examData = await generateExamFromS3(uploadedFiles, examSettings);
       examData.time = examSettings.time;
       setExamQuestions(examData);
       navigate("/exam");
@@ -47,9 +56,14 @@ export default function FileUpload({ setExamQuestions }) {
   return (
     <div className="bg-white shadow-md rounded-2xl p-6 w-full max-w-xl">
 
-      <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-        Upload Study Material
-      </h2>
+      <div className="mb-4">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-1">
+          Upload Study Material
+        </h2>
+        <h4 className="text-xs font-light">
+          Upload as many files as you need — Textbooks, lecture notes, past quizzes, slide decks, and more
+        </h4>
+      </div>
 
       {/* File Input */}
       <label className="block border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-400 transition">
