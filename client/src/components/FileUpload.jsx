@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUploadUrl, uploadToS3, generateExamFromS3 } from "../api.js";
+import { getUploadUrl, uploadToS3, generateExam } from "../api.js";
 import * as constants from "../constants.js";
 import ErrorMessage from "./ErrorMessage.jsx";
 import ExamSettings from "./ExamSettings.jsx";
@@ -34,7 +34,7 @@ export default function FileUpload({ setExamQuestions }) {
           fileType: file.type
         })
       }
-      const examData = await generateExamFromS3(uploadedFiles, examSettings);
+      const examData = await generateExam(uploadedFiles, examSettings);
       examData.time = examSettings.time;
       setExamQuestions(examData);
       navigate("/exam");
