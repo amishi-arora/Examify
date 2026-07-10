@@ -23,6 +23,10 @@ Return ONLY a JSON object in this exact format, no markdown, no backticks, no ex
     }
   ]
 } 
+Guidelines: 
+- Generate questions athat test the concepts and learning objectives from the material. Include information a student would reasonly be expected to know for an exam.
+- Do not generate questions about copyright or licensing material, publisher details, author names, aknowledgements, or metadata of the document
+- Generate questions evenly amongst the study material
 
 Study material:
 ${text}`

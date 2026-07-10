@@ -64,6 +64,28 @@ async function extractPdfText(buffer) {
   return pageTexts.join('\n');
 };
 
+function sampleText(text) {
+  const words = text.split(/\s+/);
+
+  const sampledWords = [];
+  const numberOfSections = 20;
+  const maxWords = 100000;
+  const wordsPerSection = Math.floor(maxWords / numberOfSections);
+  const sectionSize = Math.floor(words.length / numberOfSections);
+
+  for (let i = 0; i < numberOfSections; i++) {
+    const start = i * sectionSize;
+
+    const sectionSample = words.slice(
+      start,
+      start + wordsPerSection
+    )
+
+    sampledWords.push(...sectionSample);
+  }
+  return sampledWords.join(" ");
+}
+
 // --- JWT Middleware --- 
 function authenticateToken(req, res, next) {
   const token = req.headers.authorization?.split(" ")[1];
@@ -91,26 +113,18 @@ app.post("/api/generate-exam", authenticateToken, async (req, res) => {
     for (const file of files) {
       const text = await getTextFromS3File(file.key, file.fileType);
       s3Keys.push(file.key);
-      await indexDocument(file.key, text, req.user.userId);
       allText += text + "\n\n";
     }
 
     let studyMaterial;
     const isLargeDocument = allText.length > 100000;
-    if (examSettings.focusTopics) {
-      studyMaterial = await retrieveRelevantChunks(
-        `retrieve information related to: ${examSettings.focusTopics}`,
-        req.user.userId,
-        s3Keys,
-        15
-      );
-    } else if (isLargeDocument) {
-      const totalQuestions = Number(examSettings.multipleChoice) + Number(examSettings.shortAnswer);
-      studyMaterial = sampleChunks(allText, totalQuestions);
+
+    if (isLargeDocument) {
+      studyMaterial = sampleText(allText);
     } else {
       studyMaterial = allText;
     }
-    console.log("study material: ", studyMaterial);
+
     const result = await model.generateContent(
       prompts.generateExam(studyMaterial, examSettings)
     );
@@ -420,55 +434,6 @@ function sampleChunks(text, numQuestions) {
   }
   return selectedChunks.join('\n\n');
 }
-
-app.post("/api/generate-exam", authenticateToken, async (req, res) => {
-  try {
-    const { files, examSettings } = req.body;
-
-    if (!files || files.length === 0) {
-      return res.status(400).json({ error: "No files provided" });
-    }
-
-    let allText = "";
-    const s3Keys = [];
-    for (const file of files) {
-      const text = await getTextFromS3File(file.key, file.fileType);
-      s3Keys.push(file.key);
-      await indexDocument(file.key, text, req.user.userId);
-      allText += text + "\n\n";
-    }
-
-    let studyMaterial;
-    const isLargeDocument = allText.length > 100000;
-    if (examSettings.focusTopics) {
-      studyMaterial = await retrieveRelevantChunks(
-        `Questions and information about ${examSettings.focusTopics}`,
-        req.user.userId,
-        s3Keys,
-        10
-      );
-    } else if (isLargeDocument) {
-      const totalQuestions = Number(examSettings.multipleChoice) + Number(examSettings.shortAnswer);
-      studyMaterial = sampleChunks(allText, totalQuestions);
-    } else {
-      studyMaterial = allText;
-    }
-    console.log("study material: ", studyMaterial);
-    const result = await model.generateContent(
-      prompts.generateExam(studyMaterial, examSettings)
-    );
-
-    const exam = result.response
-      .text()
-      .replace(/```json\n?|```/g, "")
-      .trim();
-    res.json(JSON.parse(exam));
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to generate exam" });
-  }
-});
 
 // --- Start Server ---
 const PORT = process.env.PORT || 3001;

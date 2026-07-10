@@ -30,7 +30,6 @@ export const DEFAULT_EXAM_SETTINGS = {
     difficulty: "Medium",
     multipleChoice: "5",
     shortAnswer: "5",
-    focusTopics: "",
     additionalInstructions: "",
     time: "0"
 }

@@ -75,12 +75,7 @@ export default function ExamSettings({ settings, updateSettings, noQuestionTypes
                 <span>mins</span>
             </div>
         </div>
-
-        {/* Exam focus topics */}
-        <label className="flex flex-col gap-1">Focus topics (optional)
-            <input onChange={(e) => updateSettings("focusTopics", e.target.value)} className="p-1.5 rounded-lg border-gray-300 border" placeholder="e.g. mitosis, chemical reactions, etc." type="text" value={settings.focusTopics} />
-        </label>
-
+        
         {/* Exam additional instructions */}
         <label className="flex flex-col gap-1">Additional instructions (optional)
             <textarea onChange={(e) => updateSettings("additionalInstructions", e.target.value)} className="p-1.5 rounded-lg border-gray-300 border" placeholder="e.g. focus on calculation questions, avoid definitions, etc." value={settings.additionalInstructions} />
