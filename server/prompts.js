@@ -23,10 +23,14 @@ Return ONLY a JSON object in this exact format, no markdown, no backticks, no ex
     }
   ]
 } 
-Guidelines: 
-- Generate questions athat test the concepts and learning objectives from the material. Include information a student would reasonly be expected to know for an exam.
-- Do not generate questions about copyright or licensing material, publisher details, author names, aknowledgements, or metadata of the document
-- Generate questions evenly amongst the study material
+Guidelines:
+- Generate questions that test the academic concepts, definitions, processes, examples, calculations, and problem-solving skills from the study material.
+- Focus on information that a student would reasonably be expected to understand and apply in an exam.
+- Use important details, examples, and explanations from the material when they help test understanding.
+- Generate questions across the entire study material, ensuring coverage of different topics and concepts.
+- Do not generate questions about the document itself, such as copyright information, licensing details, publisher information, author biographies, acknowledgements, file metadata, or where information appears in the document.
+- Do not ask questions that require remembering document structure or location (e.g., "According to the preface...", "In Chapter 3...", "On slide 5...", "According to figure 2.4"...).
+- If the material contains introductory, organizational, or administrative information, treat it as context rather than exam content unless it contains actual educational concepts.
 
 Study material:
 ${text}`
