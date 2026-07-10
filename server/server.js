@@ -8,6 +8,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import db from './db.js';
 import s3 from './s3.js';
+import index from './pinecone.js';
 import * as constants from "../client/src/constants.js";
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import express from 'express';
@@ -86,14 +87,32 @@ app.post("/api/generate-exam", authenticateToken, async (req, res) => {
     }
 
     let allText = "";
-
+    const s3Keys = [];
     for (const file of files) {
       const text = await getTextFromS3File(file.key, file.fileType);
+      s3Keys.push(file.key);
+      await indexDocument(file.key, text, req.user.userId);
       allText += text + "\n\n";
     }
 
+    let studyMaterial;
+    const isLargeDocument = allText.length > 100000;
+    if (examSettings.focusTopics) {
+      studyMaterial = await retrieveRelevantChunks(
+        `retrieve information related to: ${examSettings.focusTopics}`,
+        req.user.userId,
+        s3Keys,
+        15
+      );
+    } else if (isLargeDocument) {
+      const totalQuestions = Number(examSettings.multipleChoice) + Number(examSettings.shortAnswer);
+      studyMaterial = sampleChunks(allText, totalQuestions);
+    } else {
+      studyMaterial = allText;
+    }
+    console.log("study material: ", studyMaterial);
     const result = await model.generateContent(
-      prompts.generateExam(allText, examSettings)
+      prompts.generateExam(studyMaterial, examSettings)
     );
 
     const exam = result.response.text().replace(/```json\n?|```/g, "").trim();
@@ -321,8 +340,136 @@ app.post('/api/s3-upload-url', authenticateToken, async (req, res) => {
   }
 });
 
+// --- RAG Setup --- 
+const embeddingModel = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
+
+async function generateEmbedding(text) {
+  const result = await embeddingModel.embedContent(text);
+  return result.embedding.values;
+}
+
+function chunkText(text, chunkSize = 500, overlap = 50) {
+  const words = text.split(' ');
+  const chunks = [];
+  for (let i = 0; i < words.length; i += chunkSize - overlap) {
+    const chunk = words.slice(i, i + chunkSize).join(' ');
+    if (chunk.trim()) {
+      chunks.push(chunk);
+    }
+    if (i + chunkSize >= words.length) break;
+  }
+  return chunks;
+}
+
+async function indexDocument(s3Key, text, userId) {
+  const chunks = chunkText(text);
+  let vectors = [];
+  console.log(chunks.length);
+  for (let i = 0; i < chunks.length; i++) {
+    const embedding = await generateEmbedding(chunks[i]);
+
+    vectors.push({
+      id: `${s3Key}-chunk-${i}`,
+      values: embedding,
+      metadata: {
+        text: chunks[i],
+        s3Key,
+        userId,
+        chunkIndex: i
+      }
+    });
+  }
+
+  const batchSize = 100;
+  for (let i = 0; i < vectors.length; i += batchSize) {
+    const batch = vectors.slice(i, i + batchSize);
+    await index.upsert({
+      namespace: 'default',
+      records: batch
+    });
+  }
+}
+
+async function retrieveRelevantChunks(query, userId, s3Keys, topK = 5) {
+  const queryEmbedding = await generateEmbedding(query);
+
+  const result = await index.query({
+    namespace: 'default',
+    vector: queryEmbedding,
+    topK,
+    filter: {
+      userId: { $eq: userId },
+      s3Key: { $in: s3Keys }
+    },
+    includeMetadata: true
+  })
+  return result.matches.map(match => match.metadata.text).join('\n\n');
+}
+
+function sampleChunks(text, numQuestions) {
+  const chunks = chunkText(text, 1000);
+
+  if (chunks.length <= numQuestions) {
+    return chunks.join('\n\n');
+  }
+
+  const step = Math.floor(chunks.length / numQuestions);
+  const selectedChunks = [];
+  for (let i = 0; i < chunks.length && selectedChunks.length < numQuestions; i += step) {
+    selectedChunks.push(chunks[i]);
+  }
+  return selectedChunks.join('\n\n');
+}
+
+app.post("/api/generate-exam", authenticateToken, async (req, res) => {
+  try {
+    const { files, examSettings } = req.body;
+
+    if (!files || files.length === 0) {
+      return res.status(400).json({ error: "No files provided" });
+    }
+
+    let allText = "";
+    const s3Keys = [];
+    for (const file of files) {
+      const text = await getTextFromS3File(file.key, file.fileType);
+      s3Keys.push(file.key);
+      await indexDocument(file.key, text, req.user.userId);
+      allText += text + "\n\n";
+    }
+
+    let studyMaterial;
+    const isLargeDocument = allText.length > 100000;
+    if (examSettings.focusTopics) {
+      studyMaterial = await retrieveRelevantChunks(
+        `Questions and information about ${examSettings.focusTopics}`,
+        req.user.userId,
+        s3Keys,
+        10
+      );
+    } else if (isLargeDocument) {
+      const totalQuestions = Number(examSettings.multipleChoice) + Number(examSettings.shortAnswer);
+      studyMaterial = sampleChunks(allText, totalQuestions);
+    } else {
+      studyMaterial = allText;
+    }
+    console.log("study material: ", studyMaterial);
+    const result = await model.generateContent(
+      prompts.generateExam(studyMaterial, examSettings)
+    );
+
+    const exam = result.response
+      .text()
+      .replace(/```json\n?|```/g, "")
+      .trim();
+    res.json(JSON.parse(exam));
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to generate exam" });
+  }
+});
 
 // --- Start Server ---
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
