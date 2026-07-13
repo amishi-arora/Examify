@@ -1,12 +1,12 @@
 import * as constants from "../client/src/constants.js"
 
-export const generateExam = (text, examSettings) => `You are an exam generator. Based on the following study material, generate an exam with exactly ${examSettings.multipleChoice} multiple choice questions and ${examSettings.shortAnswer} short answer questions.
+export const generateExam = (text, examSettings, focusTopics = null) => `You are an exam generator. Based on the following study material, generate an exam with exactly ${examSettings.multipleChoice} multiple choice questions and ${examSettings.shortAnswer} short answer questions.
 Make the exam of ${examSettings.difficulty} difficulty level. If mixed, distribute questions evenly across easy, medium, and hard. 
 ${examSettings.additionalInstructions ? `Additional instructions: ${examSettings.additionalInstructions}.` : ""}
+${focusTopics? `Generate questions focused on ${focusTopics}`: ""}
 Return ONLY a JSON object in this exact format, no markdown, no backticks, no explanation. List all multiple choice questions first, followed by short answer questions:
 {
   "title": "Short exam title (max 5 words) that describes the main topic of the study material",
-  "difficulty": "${examSettings.difficulty}",
   "questions": [
     {
       "id": 1,

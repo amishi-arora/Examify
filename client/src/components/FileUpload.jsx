@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUploadUrl, uploadToS3, generateExam } from "../api.js";
+import { getUploadUrl, uploadToS3, generateExam, indexDocument } from "../api.js";
 import * as constants from "../constants.js";
 import ErrorMessage from "./ErrorMessage.jsx";
 import ExamSettings from "./ExamSettings.jsx";
@@ -35,8 +35,17 @@ export default function FileUpload({ setExamQuestions }) {
         })
       }
       const examData = await generateExam(uploadedFiles, examSettings);
-      examData.time = examSettings.time;
       setExamQuestions(examData);
+
+      // Begin indexing files in the background so they can be used for RAG 
+      uploadedFiles.forEach((file) => {
+        indexDocument(file).catch(err =>
+          console.error("Indexing failed:", err)
+        );
+      });
+      examData.s3Keys = uploadedFiles.map(file => file.key);
+      examData.settings = examSettings;
+
       navigate("/exam");
     } catch (err) {
       console.log(err);
@@ -64,6 +73,7 @@ export default function FileUpload({ setExamQuestions }) {
           Upload as many files as you need — Textbooks, lecture notes, past quizzes, slide decks, and more
         </h4>
       </div>
+
 
       {/* File Input */}
       <label className="block border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-400 transition">

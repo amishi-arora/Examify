@@ -20,8 +20,8 @@ export default function BlankExamPdf({ examData }) {
                             styles.mcQuestion : styles.shortQuestion}> {q.id}. {q.questionText}</Text>
                         {
                             q.type === constants.QUESTION_TYPES.MC ?
-                                q.options.map(o =>
-                                    <Text style={styles.mcOption}> {o}</Text>) :
+                                q.options.map((o, i) =>
+                                    <Text key = {i} style={styles.mcOption}> {o}</Text>) :
                                 ""
                         }
                     </View>

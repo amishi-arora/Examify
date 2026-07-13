@@ -109,10 +109,8 @@ app.post("/api/generate-exam", authenticateToken, async (req, res) => {
     }
 
     let allText = "";
-    const s3Keys = [];
     for (const file of files) {
       const text = await getTextFromS3File(file.key, file.fileType);
-      s3Keys.push(file.key);
       allText += text + "\n\n";
     }
 
@@ -254,8 +252,8 @@ app.post('/api/login', async (req, res) => {
 
 app.post('/api/save-exam', authenticateToken, async (req, res) => {
   try {
-    const { title, questions, difficulty, results, studentAnswers, insights } = req.body;
-    if (!title || !questions || !difficulty || !results || !studentAnswers || !insights) {
+    const { title, questions, settings, results, studentAnswers, insights, documentKeys } = req.body;
+    if (!title || !questions || !settings || !results || !studentAnswers || !insights || !documentKeys) {
       return res.status(400).json({ error: 'All exam information is required' });
     }
     const examId = uuidv4();
@@ -263,7 +261,7 @@ app.post('/api/save-exam', authenticateToken, async (req, res) => {
     const userId = req.user.userId;
     await db.send(new PutCommand({
       TableName: 'Exams',
-      Item: { examId, userId, title, questions, difficulty, date, results, studentAnswers, insights }
+      Item: { examId, userId, title, questions, settings, date, results, studentAnswers, insights, documentKeys }
     }));
     res.json({ examId })
 
@@ -354,16 +352,145 @@ app.post('/api/s3-upload-url', authenticateToken, async (req, res) => {
   }
 });
 
+app.post("/api/index-document", authenticateToken, async (req, res) => {
+  try {
+    const { file } = req.body;
+
+    if (!file || !file.key || !file.fileType) {
+      return res.status(400).json({
+        error: "Missing file information"
+      });
+    }
+
+    const { key: s3Key, fileType } = file;
+
+
+    // Step 1: Get text from S3
+    const text = await getTextFromS3File(s3Key, fileType);
+
+    // Step 2: Chunk + embed + store vectors
+    await indexDocument(
+      s3Key,
+      text,
+      req.user.userId
+    );
+
+    res.json({
+      message: "Document indexed successfully",
+      s3Key
+    });
+
+  } catch (err) {
+    console.error("Indexing error:", err);
+
+    res.status(500).json({
+      error: "Failed to index document"
+    });
+  }
+});
+
+app.post("/api/regenerate-exam", authenticateToken, async (req, res) => {
+  try {
+    const {
+      documentKeys,
+      weakTopics,
+      examSettings
+    } = req.body;
+
+
+    if (!documentKeys || !examSettings || !weakTopics || weakTopics.length === 0) {
+      return res.status(400).json({
+        error: "Missing document or weak topics"
+      });
+    }
+
+
+    // 1. Create retrieval query
+    const query = `
+      Generate practice questions to help a student improve on:
+      ${weakTopics.join(", ")}
+    `;
+
+
+    // 2. Retrieve relevant chunks
+    const studyMaterial = await retrieveRelevantChunks(
+      query,
+      req.user.userId,
+      documentKeys,
+      10
+    );
+
+
+    console.log("Retrieved material:");
+    console.log(studyMaterial);
+
+
+    // 3. Generate new exam
+    const result = await model.generateContent(
+      prompts.generateExam(
+        studyMaterial,
+        examSettings,
+        weakTopics
+      )
+    );
+
+
+    const exam = result.response
+      .text()
+      .replace(/```json\n?|```/g, "")
+      .trim();
+
+
+    res.json(JSON.parse(exam));
+
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Failed to regenerate exam"
+    });
+  }
+});
+
 // --- RAG Setup --- 
 const embeddingModel = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
 
-async function generateEmbedding(text) {
-  const result = await embeddingModel.embedContent(text);
-  return result.embedding.values;
+async function generateEmbeddings(chunks) {
+  const result = await embeddingModel.batchEmbedContents({
+    requests: chunks.map(chunk => ({
+      content: {
+        role: "user",
+        parts: [{ text: chunk }]
+      },
+      taskType: "RETRIEVAL_DOCUMENT"
+    }))
+  });
+
+  return result.embeddings.map(e => e.values);
 }
 
-function chunkText(text, chunkSize = 500, overlap = 50) {
-  const words = text.split(' ');
+async function generateEmbedding(text) {
+  const result = await embeddingModel.batchEmbedContents({
+    requests: [
+      {
+        content: {
+          parts: [
+            {
+              text
+            }
+          ]
+        },
+        taskType: "RETRIEVAL_QUERY"
+      }
+    ]
+  });
+
+  return result.embeddings[0].values;
+}
+
+function chunkText(text, chunkSize = 300, overlap = 50) {
+  const words = text.split(/\s+/);
   const chunks = [];
   for (let i = 0; i < words.length; i += chunkSize - overlap) {
     const chunk = words.slice(i, i + chunkSize).join(' ');
@@ -375,64 +502,58 @@ function chunkText(text, chunkSize = 500, overlap = 50) {
   return chunks;
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function indexDocument(s3Key, text, userId) {
   const chunks = chunkText(text);
-  let vectors = [];
-  console.log(chunks.length);
-  for (let i = 0; i < chunks.length; i++) {
-    const embedding = await generateEmbedding(chunks[i]);
-
-    vectors.push({
-      id: `${s3Key}-chunk-${i}`,
-      values: embedding,
-      metadata: {
-        text: chunks[i],
-        s3Key,
-        userId,
-        chunkIndex: i
-      }
-    });
-  }
 
   const batchSize = 100;
-  for (let i = 0; i < vectors.length; i += batchSize) {
-    const batch = vectors.slice(i, i + batchSize);
+
+  console.log(`Indexing ${chunks.length} chunks`);
+
+  for (let i = 0; i < chunks.length; i += batchSize) {
+    const batchChunks = chunks.slice(i, i + batchSize);
+
+    const embeddings = await generateEmbeddings(batchChunks);
+
+    const records = embeddings.map((embedding, index) => ({
+      id: `${s3Key}-chunk-${i + index}`,
+      values: embedding,
+      metadata: {
+        text: batchChunks[index],
+        s3Key,
+        userId,
+        chunkIndex: i + index
+      }
+    }));
+
     await index.upsert({
-      namespace: 'default',
-      records: batch
+      namespace: "default",
+      records
     });
+
+    console.log(`Indexed ${Math.min(i + batchSize, chunks.length)}/${chunks.length}`);
+
+    await sleep(5000);
   }
 }
 
-async function retrieveRelevantChunks(query, userId, s3Keys, topK = 5) {
+async function retrieveRelevantChunks(query, userId, documentKeys, topK) {
   const queryEmbedding = await generateEmbedding(query);
-
+  console.log(documentKeys);
   const result = await index.query({
     namespace: 'default',
     vector: queryEmbedding,
     topK,
     filter: {
       userId: { $eq: userId },
-      s3Key: { $in: s3Keys }
+      s3Key: { $in: documentKeys }
     },
     includeMetadata: true
   })
   return result.matches.map(match => match.metadata.text).join('\n\n');
-}
-
-function sampleChunks(text, numQuestions) {
-  const chunks = chunkText(text, 1000);
-
-  if (chunks.length <= numQuestions) {
-    return chunks.join('\n\n');
-  }
-
-  const step = Math.floor(chunks.length / numQuestions);
-  const selectedChunks = [];
-  for (let i = 0; i < chunks.length && selectedChunks.length < numQuestions; i += step) {
-    selectedChunks.push(chunks[i]);
-  }
-  return selectedChunks.join('\n\n');
 }
 
 // --- Start Server ---

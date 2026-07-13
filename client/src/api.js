@@ -78,14 +78,14 @@ export async function register(name, email, password) {
   return res.json();
 }
 
-export async function saveExam(title, questions, difficulty, results, studentAnswers, insights) {
+export async function saveExam(title, questions, settings, results, studentAnswers, insights, documentKeys) {
   const res = await fetch(`${BASE_URL}/api/save-exam`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${localStorage.getItem("token")}`
     },
-    body: JSON.stringify({ title, questions, difficulty, results, studentAnswers, insights })
+    body: JSON.stringify({ title, questions, settings, results, studentAnswers, insights, documentKeys })
   });
   if (!res.ok) {
     if (res.status === 401 || res.status === 403) {
@@ -175,9 +175,58 @@ export async function getUploadUrl(file) {
   return res.json();
 }
 
+export async function indexDocument(file) {
+  const res = await fetch(`${BASE_URL}/api/index-document`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    },
+    body: JSON.stringify({
+      file: {
+        key: file.key,
+        fileType: file.fileType
+      }
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to index document");
+  }
+
+  return res.json();
+}
+
 export async function uploadToS3(file, uploadUrl) {
   await fetch(uploadUrl, {
     method: "PUT",
     body: file,
   })
+}
+
+
+export async function regenerateExam(
+  documentKeys,
+  weakTopics,
+  examSettings
+) {
+  console.log(documentKeys);
+  const res = await fetch(`${BASE_URL}/api/regenerate-exam`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    },
+    body: JSON.stringify({
+      documentKeys,
+      weakTopics,
+      examSettings
+    })
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to regenerate exam");
+  }
+
+  return res.json();
 }

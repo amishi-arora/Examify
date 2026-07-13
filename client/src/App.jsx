@@ -28,11 +28,11 @@ function App() {
         } />
         <Route path="/home" element={isTokenValid(token) ? <HomePage setExamQuestions={setExamQuestions} /> : <Navigate to="/" />} />
         <Route path="/exam" element={isTokenValid(token) && Object.keys(examQuestions).length ?
-          <ExamPage examQuestions={examQuestions} /> :
+          <ExamPage exam={examQuestions} /> :
           <Navigate to="/home" />
         } />
         <Route path="/results" element={isTokenValid(token) ?
-          <ExamResultsPage /> :
+          <ExamResultsPage setExamQuestions={setExamQuestions} /> :
           <Navigate to="/home" />
         } />
       </Routes>

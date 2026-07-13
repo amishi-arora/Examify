@@ -11,7 +11,7 @@ import BackButton from "../components/BackButton";
 import ExamResultsPDF from "../components/ExamResultsPdf";
 import BlankExamPdf from "../components/BlankExamPdf";
 
-export default function ExamResultsPage() {
+export default function ExamResultsPage({ setExamQuestions }) {
     const { state } = useLocation();
     const [exam, setExam] = useState(null);
     const [error, setError] = useState(null);
@@ -30,7 +30,6 @@ export default function ExamResultsPage() {
         fetchExam();
     }, []);
 
-
     // If someone navigates to /results without state.examId, return home 
     if (!state?.examId) return <Navigate to="/home" />;
 
@@ -43,7 +42,7 @@ export default function ExamResultsPage() {
                 <BackButton to="/home" label="← Back to home"></BackButton>
 
                 <div className="flex flex-col items-start gap-2 text-xs">
-                    <PDFDownloadLink
+                    {exam && <PDFDownloadLink
                         document={<ExamResultsPDF examData={exam} />}
                         fileName="exam-results.pdf">
                         {({ loading }) => (
@@ -51,8 +50,8 @@ export default function ExamResultsPage() {
                                 Download Results
                             </button>
                         )}
-                    </PDFDownloadLink>
-                    <PDFDownloadLink
+                    </PDFDownloadLink>}
+                    {exam && <PDFDownloadLink
                         document={<BlankExamPdf examData={exam} />}
                         fileName="blank-exam.pdf">
                         {({ loading }) => (
@@ -60,7 +59,7 @@ export default function ExamResultsPage() {
                                 Download Blank Exam
                             </button>
                         )}
-                    </PDFDownloadLink>
+                    </PDFDownloadLink>}
                 </div>
             </div>
             <div className="w-[75%]">
@@ -71,7 +70,7 @@ export default function ExamResultsPage() {
 
             {exam && <ScoreBanner score={score} total={total} />}
 
-            {exam && <InsightsCard insights={exam.insights} />}
+            {exam && <InsightsCard exam={exam} setExamQuestions={setExamQuestions} />}
 
             {exam && exam.questions.map((q, i) => <GradedExamQuestion key={i} studentAnswer={exam.studentAnswers[q.id]} question={q} result={exam.results[q.id]} />)}
 
