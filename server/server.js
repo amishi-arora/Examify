@@ -26,7 +26,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// --- Text Extraction Helpers --- 
+// --- Helpers --- 
 async function getTextFromS3File(key, fileType) {
   const response = await s3.send(new GetObjectCommand({
     Bucket: process.env.AWS_BUCKET_NAME,
@@ -64,26 +64,17 @@ async function extractPdfText(buffer) {
   return pageTexts.join('\n');
 };
 
-function sampleText(text) {
-  const words = text.split(/\s+/);
+function sampleText(text, maxChars = 500000, numberOfSections = 20) {
+  const sectionSize = Math.floor(text.length / numberOfSections);
+  const charsPerSection = maxChars / numberOfSections; 
 
-  const sampledWords = [];
-  const numberOfSections = 20;
-  const maxWords = 100000;
-  const wordsPerSection = Math.floor(maxWords / numberOfSections);
-  const sectionSize = Math.floor(words.length / numberOfSections);
+  const sampledSections = [];
 
   for (let i = 0; i < numberOfSections; i++) {
     const start = i * sectionSize;
-
-    const sectionSample = words.slice(
-      start,
-      start + wordsPerSection
-    )
-
-    sampledWords.push(...sectionSample);
+    sampledSections.push(text.slice(start, start + charsPerSection));
   }
-  return sampledWords.join(" ");
+  return sampledSections.join(" ");
 }
 
 // --- JWT Middleware --- 
@@ -115,7 +106,7 @@ app.post("/api/generate-exam", authenticateToken, async (req, res) => {
     }
 
     let studyMaterial;
-    const isLargeDocument = allText.length > 100000;
+    const isLargeDocument = allText.length > 500000;
 
     if (isLargeDocument) {
       studyMaterial = sampleText(allText);
