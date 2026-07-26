@@ -536,7 +536,7 @@ async function indexDocument(s3Key, text, userId) {
 
     console.log(`Indexed ${Math.min(i + batchSize, chunks.length)}/${chunks.length}`);
 
-    await sleep(5000);
+    await sleep(10000);
   }
 }
 

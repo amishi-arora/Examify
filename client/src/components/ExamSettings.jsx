@@ -2,9 +2,9 @@ import ErrorMessage from "./ErrorMessage"
 
 export default function ExamSettings({ settings, updateSettings, noQuestionTypesSelected }) {
 
-    function handleCountChange(setting, value) {
+    function handleCountChange(setting, value, max) {
         const num = Number(value);
-        if (num >= 0 && num <= 10) {
+        if (num >= 0 && num <= max) {
             updateSettings(setting, value);
         }
     }
@@ -30,10 +30,10 @@ export default function ExamSettings({ settings, updateSettings, noQuestionTypes
                 Multiple Choice
             </label>
             <input
-                onChange={(e) => handleCountChange("multipleChoice", e.target.value)}
+                onChange={(e) => handleCountChange("multipleChoice", e.target.value, 50)}
                 type="number"
                 min="0"
-                max="10"
+                max="50"
                 value={settings.multipleChoice}
                 className="border border-gray-300 rounded-lg w-14 p-1 text-center focus:border-blue-400"
             />
@@ -45,10 +45,10 @@ export default function ExamSettings({ settings, updateSettings, noQuestionTypes
                 Short Answer
             </label>
             <input
-                onChange={(e) => handleCountChange("shortAnswer", e.target.value)}
+                onChange={(e) => handleCountChange("shortAnswer", e.target.value, 20)}
                 type="number"
                 min="0"
-                max="10"
+                max="20"
                 value={settings.shortAnswer}
                 className="border border-gray-300 rounded-lg w-14 p-1 text-center focus:border-blue-400"
             />
@@ -68,7 +68,7 @@ export default function ExamSettings({ settings, updateSettings, noQuestionTypes
                     onChange={(e) => updateSettings("time", e.target.value)}
                     type="number"
                     min="0"
-                    max="10"
+                    max="20"
                     value={settings.time}
                     className="w-min p-0 text-center focus:border-blue-400 border border-gray-300 rounded-lg p-1"
                 />
