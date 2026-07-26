@@ -175,28 +175,6 @@ export async function getUploadUrl(file) {
   return res.json();
 }
 
-export async function indexDocument(file) {
-  const res = await fetch(`${BASE_URL}/api/index-document`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`
-    },
-    body: JSON.stringify({
-      file: {
-        key: file.key,
-        fileType: file.fileType
-      }
-    }),
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to index document");
-  }
-
-  return res.json();
-}
-
 export async function uploadToS3(file, uploadUrl) {
   await fetch(uploadUrl, {
     method: "PUT",

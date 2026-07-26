@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUploadUrl, uploadToS3, generateExam, indexDocument } from "../api.js";
+import { getUploadUrl, uploadToS3, generateExam } from "../api.js";
 import * as constants from "../constants.js";
 import ErrorMessage from "./ErrorMessage.jsx";
 import ExamSettings from "./ExamSettings.jsx";
@@ -24,28 +24,16 @@ export default function FileUpload({ setExamQuestions }) {
     setGenerating(true);
     setError(null);
     try {
-      const uploadedFiles = [];
-
-      for (const file of files) {
+      const uploadedFiles = await Promise.all(files.map(async file => {
         const { uploadUrl, key } = await getUploadUrl(file);
         await uploadToS3(file, uploadUrl);
-        uploadedFiles.push({
-          key,
-          fileType: file.type
-        })
-      }
-      const examData = await generateExam(uploadedFiles, examSettings);
-      setExamQuestions(examData);
+        return { key, filetype: file.type };
+      }))
 
-      // Begin indexing files in the background so they can be used for RAG 
-      uploadedFiles.forEach((file) => {
-        indexDocument(file).catch(err =>
-          console.error("Indexing failed:", err)
-        );
-      });
+      const examData = await generateExam(uploadedFiles, examSettings);
       examData.s3Keys = uploadedFiles.map(file => file.key);
       examData.settings = examSettings;
-
+      setExamQuestions(examData);
       navigate("/exam");
     } catch (err) {
       console.log(err);

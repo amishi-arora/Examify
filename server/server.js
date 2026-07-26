@@ -66,7 +66,7 @@ async function extractPdfText(buffer) {
 
 function sampleText(text, maxChars = 500000, numberOfSections = 20) {
   const sectionSize = Math.floor(text.length / numberOfSections);
-  const charsPerSection = maxChars / numberOfSections; 
+  const charsPerSection = maxChars / numberOfSections;
 
   const sampledSections = [];
 
@@ -101,7 +101,7 @@ app.post("/api/generate-exam", authenticateToken, async (req, res) => {
 
     let allText = "";
     for (const file of files) {
-      const text = await getTextFromS3File(file.key, file.fileType);
+      const text = await getTextFromS3File(file.key, file.filetype);
       allText += text + "\n\n";
     }
 
@@ -120,6 +120,16 @@ app.post("/api/generate-exam", authenticateToken, async (req, res) => {
 
     const exam = result.response.text().replace(/```json\n?|```/g, "").trim();
     res.json(JSON.parse(exam));
+
+    // Begin indexing files in the background so they can be used for RAG 
+    files.forEach(async (file) => {
+      try {
+        const text = await getTextFromS3File(file.key, file.filetype);
+        await indexDocument(file.key, text, req.user.userId);
+      } catch (err) {
+        console.error("Indexing failed:", err);
+      }
+    });
 
   } catch (err) {
     console.error(err);
@@ -324,7 +334,7 @@ app.post('/api/s3-upload-url', authenticateToken, async (req, res) => {
   try {
     const { fileName, fileType } = req.body;
 
-    const key = `uploads/${Date.now()}-${fileName}`;
+    const key = `uploads/${uuidv4()}-${fileName}`;
     const command = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: key,
@@ -340,43 +350,6 @@ app.post('/api/s3-upload-url', authenticateToken, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to generate upload URL" });
-  }
-});
-
-app.post("/api/index-document", authenticateToken, async (req, res) => {
-  try {
-    const { file } = req.body;
-
-    if (!file || !file.key || !file.fileType) {
-      return res.status(400).json({
-        error: "Missing file information"
-      });
-    }
-
-    const { key: s3Key, fileType } = file;
-
-
-    // Step 1: Get text from S3
-    const text = await getTextFromS3File(s3Key, fileType);
-
-    // Step 2: Chunk + embed + store vectors
-    await indexDocument(
-      s3Key,
-      text,
-      req.user.userId
-    );
-
-    res.json({
-      message: "Document indexed successfully",
-      s3Key
-    });
-
-  } catch (err) {
-    console.error("Indexing error:", err);
-
-    res.status(500).json({
-      error: "Failed to index document"
-    });
   }
 });
 
@@ -410,11 +383,6 @@ app.post("/api/regenerate-exam", authenticateToken, async (req, res) => {
       documentKeys,
       10
     );
-
-
-    console.log("Retrieved material:");
-    console.log(studyMaterial);
-
 
     // 3. Generate new exam
     const result = await model.generateContent(
@@ -526,14 +494,12 @@ async function indexDocument(s3Key, text, userId) {
     });
 
     console.log(`Indexed ${Math.min(i + batchSize, chunks.length)}/${chunks.length}`);
-
     await sleep(10000);
   }
 }
 
 async function retrieveRelevantChunks(query, userId, documentKeys, topK) {
   const queryEmbedding = await generateEmbedding(query);
-  console.log(documentKeys);
   const result = await index.query({
     namespace: 'default',
     vector: queryEmbedding,
