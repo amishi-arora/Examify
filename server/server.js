@@ -83,7 +83,7 @@ function authenticateToken(req, res, next) {
   if (!token) return res.status(401).json({ error: "Unauthorized" });
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) res.status(403).json({ error: "Invalid token" });
+    if (err) return res.status(403).json({ error: "Invalid token" });
 
     req.user = user;
     next();
@@ -122,14 +122,7 @@ app.post("/api/generate-exam", authenticateToken, async (req, res) => {
     res.json(JSON.parse(exam));
 
     // Begin indexing files in the background so they can be used for RAG 
-    files.forEach(async (file) => {
-      try {
-        const text = await getTextFromS3File(file.key, file.filetype);
-        await indexDocument(file.key, text, req.user.userId);
-      } catch (err) {
-        console.error("Indexing failed:", err);
-      }
-    });
+    beginBackgroundIndexing(files, req.user.userId);
 
   } catch (err) {
     console.error(err);
@@ -368,23 +361,14 @@ app.post("/api/regenerate-exam", authenticateToken, async (req, res) => {
       });
     }
 
-
-    // 1. Create retrieval query
-    const query = `
-      Generate practice questions to help a student improve on:
-      ${weakTopics.join(", ")}
-    `;
-
-
-    // 2. Retrieve relevant chunks
+    // Retrieve relevant chunks
     const studyMaterial = await retrieveRelevantChunks(
-      query,
+      weakTopics,
       req.user.userId,
-      documentKeys,
-      10
+      documentKeys
     );
 
-    // 3. Generate new exam
+    // Generate new exam
     const result = await model.generateContent(
       prompts.generateExam(
         studyMaterial,
@@ -448,7 +432,7 @@ async function generateEmbedding(text) {
   return result.embeddings[0].values;
 }
 
-function chunkText(text, chunkSize = 300, overlap = 50) {
+function chunkText(text, chunkSize = 300, overlap = 30) {
   const words = text.split(/\s+/);
   const chunks = [];
   for (let i = 0; i < words.length; i += chunkSize - overlap) {
@@ -463,6 +447,18 @@ function chunkText(text, chunkSize = 300, overlap = 50) {
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+async function beginBackgroundIndexing(files, userId) {
+  for (const file of files) {
+    try {
+      const text = await getTextFromS3File(file.key, file.filetype);
+      await indexDocument(file.key, text, userId);
+    } catch (err) {
+      console.error(`Indexing failed for ${file.key}:`, err);
+    }
+  }
 }
 
 async function indexDocument(s3Key, text, userId) {
@@ -498,19 +494,25 @@ async function indexDocument(s3Key, text, userId) {
   }
 }
 
-async function retrieveRelevantChunks(query, userId, documentKeys, topK) {
-  const queryEmbedding = await generateEmbedding(query);
-  const result = await index.query({
-    namespace: 'default',
-    vector: queryEmbedding,
-    topK,
-    filter: {
-      userId: { $eq: userId },
-      s3Key: { $in: documentKeys }
-    },
-    includeMetadata: true
-  })
-  return result.matches.map(match => match.metadata.text).join('\n\n');
+async function retrieveRelevantChunks(topics, userId, documentKeys, topKPerTopic = 3) {
+  const resultsPerTopic = await Promise.all(topics.map(async topic => {
+    const topicEmbedding = await generateEmbedding(topic);
+    return index.query({
+      namespace: 'default',
+      vector: topicEmbedding,
+      topK: topKPerTopic,
+      filter: {
+        userId: { $eq: userId },
+        s3Key: { $in: documentKeys }
+      },
+      includeMetadata: true
+    });
+  }));
+
+  return resultsPerTopic
+    .flatMap(r => r.matches)
+    .map(m => m.metadata.text)
+    .join('\n\n');
 }
 
 // --- Start Server ---
