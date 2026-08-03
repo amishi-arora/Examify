@@ -188,7 +188,6 @@ export async function regenerateExam(
   weakTopics,
   examSettings
 ) {
-  console.log(documentKeys);
   const res = await fetch(`${BASE_URL}/api/regenerate-exam`, {
     method: "POST",
     headers: {

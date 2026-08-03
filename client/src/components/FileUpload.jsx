@@ -36,7 +36,7 @@ export default function FileUpload({ setExamQuestions }) {
       setExamQuestions(examData);
       navigate("/exam");
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setGenerating(false);
       setError(err.message);
     }

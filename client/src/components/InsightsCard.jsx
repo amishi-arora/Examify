@@ -52,7 +52,7 @@ export default function InsightsCard({ exam, setExamQuestions }) {
             examData.settings = exam.settings;
             navigate("/exam");
         } catch (err) {
-            console.log(err);
+            console.error(err);
             setGenerating(false);
             setError(err.message);
         }

@@ -23,7 +23,7 @@ export default function ExamResultsPage({ setExamQuestions }) {
                 const data = await getExam(state.examId);
                 setExam(data);
             } catch (err) {
-                console.log(err);
+                console.error(err);
                 setError(err.message);
             }
         }

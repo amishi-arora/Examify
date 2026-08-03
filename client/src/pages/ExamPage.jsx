@@ -36,7 +36,7 @@ export default function ExamPage({ exam }) {
                 replace: true
             });
         } catch (err) {
-            console.log(err);
+            console.error(err);
             setGrading(false);
             setError(err.message);
         }
