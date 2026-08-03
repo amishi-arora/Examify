@@ -19,7 +19,7 @@ dotenv.config();
 
 // --- AI Setup --- 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+const model = genAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite' });
 
 // --- Middleware ---
 const app = express();
@@ -113,6 +113,7 @@ app.post("/api/generate-exam", authenticateToken, async (req, res) => {
     } else {
       studyMaterial = allText;
     }
+    console.log(studyMaterial); 
 
     const result = await model.generateContent(
       prompts.generateExam(studyMaterial, examSettings)
