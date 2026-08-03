@@ -112,6 +112,13 @@ async function findIndexedDocumentByHash(userId, contentHash) {
   return result.Items.find(item => item.status === "READY");
 }
 
+async function verifyOwnership(userId, keys) {
+  const results = await Promise.all(keys.map(key =>
+    db.send(new GetCommand({ TableName: "Documents", Key: { userId, documentId: key } }))
+  ));
+  return results.every(r => r.Item !== undefined);
+}
+
 // --- JWT Middleware --- 
 function authenticateToken(req, res, next) {
   const token = req.headers.authorization?.split(" ")[1];
@@ -134,6 +141,12 @@ app.post("/api/generate-exam", authenticateToken, async (req, res) => {
       return res.status(400).json({ error: "No files provided" });
     }
 
+    const keys = files.map(f => f.key);
+    const owned = await verifyOwnership(req.user.userId, keys);
+    if (!owned) {
+      return res.status(403).json({ error: "One or more documents not owned by this user" })
+    }
+
     let allText = "";
     for (const file of files) {
       const text = await getTextFromS3File(file.key, file.filetype);
@@ -148,7 +161,7 @@ app.post("/api/generate-exam", authenticateToken, async (req, res) => {
     } else {
       studyMaterial = allText;
     }
-    
+
     const result = await model.generateContent(
       prompts.generateExam(studyMaterial, examSettings)
     );
@@ -408,6 +421,11 @@ app.post("/api/regenerate-exam", authenticateToken, async (req, res) => {
       });
     }
 
+    const owned = await verifyOwnership(req.user.userId, documentKeys);
+    if (!owned) {
+      return res.status(403).json({ error: "One or more documents not owned by this user" })
+    }
+
     // Retrieve relevant chunks
     const studyMaterial = await retrieveRelevantChunks(
       weakTopics,
@@ -525,7 +543,7 @@ async function beginBackgroundIndexing(files, userId) {
         continue;
       }
       await indexDocument(contentHash, text, userId)
-      await updateDocumentStatus(userId, file.key, "READY", contentHash); 
+      await updateDocumentStatus(userId, file.key, "READY", contentHash);
     } catch (err) {
       console.error(`Indexing failed for ${file.key}:`, err);
       await updateDocumentStatus(userId, file.key, "FAILED");
