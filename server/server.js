@@ -65,7 +65,7 @@ async function extractPdfText(buffer) {
   return pageTexts.join('\n');
 };
 
-function sampleText(text, maxChars = 500000, numberOfSections = 20) {
+function sampleText(text, maxChars = 300000, numberOfSections = 20) {
   const sectionSize = Math.floor(text.length / numberOfSections);
   const charsPerSection = maxChars / numberOfSections;
 
@@ -153,14 +153,8 @@ app.post("/api/generate-exam", authenticateToken, async (req, res) => {
       allText += text + "\n\n";
     }
 
-    let studyMaterial;
-    const isLargeDocument = allText.length > 500000;
-
-    if (isLargeDocument) {
-      studyMaterial = sampleText(allText);
-    } else {
-      studyMaterial = allText;
-    }
+    const isLargeDocument = allText.length > 300000;
+    const studyMaterial = isLargeDocument ? sampleText(allText) : allText; 
 
     const result = await model.generateContent(
       prompts.generateExam(studyMaterial, examSettings)

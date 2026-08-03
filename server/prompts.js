@@ -6,14 +6,14 @@ ${examSettings.additionalInstructions ? `Additional instructions: ${examSettings
 ${focusTopics? `Generate questions focused on ${focusTopics}`: ""}
 Return ONLY a JSON object in this exact format, no markdown, no backticks, no explanation. List all multiple choice questions first, followed by short answer questions:
 {
-  "title": "Short exam title (max 5 words) that describes the main topic of the study material",
+  "title": "Short exam title (max 5 words) that describes the study material",
   "questions": [
     {
       "id": 1,
       "type": "${constants.QUESTION_TYPES.MC}",
       "questionText": "question here",
-      "options": ["A. option1", "B. option2", "C. option3", "D. option4"],
-      "answer": "A. option1"
+      "options": ["A. [option text]", "B. [option text]", "C. [option text]", "D. [option text]"],
+      "answer": "[the letter and full text of the correct option, e.g. C. some correct answer]"
     },
     {
       "id": 2,
@@ -24,9 +24,10 @@ Return ONLY a JSON object in this exact format, no markdown, no backticks, no ex
   ]
 } 
 Guidelines:
-- Before generating questions, internally identify the major topics and subtopics covered in the study material.
-- Create a balanced question distribution plan across these topics before writing questions.
-- Ensure every major topic is represented.
+- There may be text from multiple documents present. Ensure the questions are evenly distributed amongst documents and distinct topics. 
+- Before generating questions, scan the ENTIRE study material from start to end — do not stop after the first apparent topic or document. If multiple distinct subjects are present, explicitly plan question coverage across each one before writing any questions.
+- Internally identify the major topics and subtopics covered in the study material, across every distinct source present.
+- Create a balanced question distribution plan across these topics AND across every distinct document/subject
 - Generate questions that test the academic concepts, definitions, processes, examples, calculations, and problem-solving skills from the study material.
 - Focus on information that a student would reasonably be expected to understand and apply in an exam.
 - Use important details, examples, and explanations from the material when they help test understanding.
