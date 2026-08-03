@@ -14,6 +14,7 @@ import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import express from 'express';
 import cors from 'cors';
 import * as prompts from "./prompts.js";
+import crypto from 'crypto';
 dotenv.config();
 
 
@@ -77,23 +78,38 @@ function sampleText(text, maxChars = 500000, numberOfSections = 20) {
   return sampledSections.join(" ");
 }
 
-async function updateDocumentStatus(userId, documentId, status) {
-  await db.send(
-    new UpdateCommand({
-      TableName: "Documents",
-      Key: {
-        userId,
-        documentId
-      },
-      UpdateExpression: "SET #status = :status",
-      ExpressionAttributeNames: {
-        "#status": "status"
-      },
-      ExpressionAttributeValues: {
-        ":status": status,
-      }
-    })
-  )
+async function updateDocumentStatus(userId, documentId, status, contentHash = null) {
+  const updateExpr = contentHash
+    ? "SET #status = :status, contentHash = :contentHash"
+    : "SET #status = :status";
+  const values = contentHash
+    ? { ":status": status, ":contentHash": contentHash }
+    : { ":status": status };
+
+  await db.send(new UpdateCommand({
+    TableName: "Documents",
+    Key: { userId, documentId },
+    UpdateExpression: updateExpr,
+    ExpressionAttributeNames: { "#status": "status" },
+    ExpressionAttributeValues: values
+  }));
+}
+
+function hashText(text) {
+  return crypto.createHash('sha256').update(text).digest('hex');
+}
+
+async function findIndexedDocumentByHash(userId, contentHash) {
+  const result = await db.send(new QueryCommand({
+    TableName: "Documents",
+    IndexName: "userId-contentHash-index",
+    KeyConditionExpression: "userId = :userId and contentHash = :contentHash",
+    ExpressionAttributeValues: {
+      ":userId": userId,
+      ":contentHash": contentHash
+    }
+  }));
+  return result.Items.find(item => item.status === "READY");
 }
 
 // --- JWT Middleware --- 
@@ -132,8 +148,7 @@ app.post("/api/generate-exam", authenticateToken, async (req, res) => {
     } else {
       studyMaterial = allText;
     }
-    console.log(studyMaterial);
-
+    
     const result = await model.generateContent(
       prompts.generateExam(studyMaterial, examSettings)
     );
@@ -501,8 +516,16 @@ async function beginBackgroundIndexing(files, userId) {
   for (const file of files) {
     try {
       const text = await getTextFromS3File(file.key, file.filetype);
-      await indexDocument(file.key, text, userId);
-      await updateDocumentStatus(userId, file.key, "READY")
+      const contentHash = hashText(text);
+
+      const existing = await findIndexedDocumentByHash(userId, contentHash);
+      if (existing) {
+        console.log(`Skipping ${file.key} — identical content already indexed (hash ${contentHash})`);
+        await updateDocumentStatus(userId, file.key, "READY", contentHash);
+        continue;
+      }
+      await indexDocument(contentHash, text, userId)
+      await updateDocumentStatus(userId, file.key, "READY", contentHash); 
     } catch (err) {
       console.error(`Indexing failed for ${file.key}:`, err);
       await updateDocumentStatus(userId, file.key, "FAILED");
@@ -510,7 +533,7 @@ async function beginBackgroundIndexing(files, userId) {
   }
 }
 
-async function indexDocument(s3Key, text, userId) {
+async function indexDocument(contentHash, text, userId) {
   const chunks = chunkText(text);
 
   const batchSize = 100;
@@ -523,11 +546,11 @@ async function indexDocument(s3Key, text, userId) {
     const embeddings = await generateEmbeddings(batchChunks);
 
     const records = embeddings.map((embedding, index) => ({
-      id: `${s3Key}-chunk-${i + index}`,
+      id: `${contentHash}-chunk-${i + index}`,
       values: embedding,
       metadata: {
         text: batchChunks[index],
-        s3Key,
+        contentHash,
         userId,
         chunkIndex: i + index
       }
@@ -544,7 +567,16 @@ async function indexDocument(s3Key, text, userId) {
 
 }
 
+async function getContentHashesForKeys(userId, documentKeys) {
+  const results = await Promise.all(documentKeys.map(key =>
+    db.send(new GetCommand({ TableName: "Documents", Key: { userId, documentId: key } }))
+  ));
+  return results.map(r => r.Item?.contentHash).filter(Boolean);
+}
+
 async function retrieveRelevantChunks(topics, userId, documentKeys, topKPerTopic = 3) {
+  const contentHashes = await getContentHashesForKeys(userId, documentKeys);
+
   const resultsPerTopic = await Promise.all(topics.map(async topic => {
     const topicEmbedding = await generateEmbedding(topic);
     return index.query({
@@ -553,7 +585,7 @@ async function retrieveRelevantChunks(topics, userId, documentKeys, topKPerTopic
       topK: topKPerTopic,
       filter: {
         userId: { $eq: userId },
-        s3Key: { $in: documentKeys }
+        contentHash: { $in: contentHashes }
       },
       includeMetadata: true
     });
