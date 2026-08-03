@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
-import { PutCommand, GetCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
+import { PutCommand, GetCommand, QueryCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -77,6 +77,25 @@ function sampleText(text, maxChars = 500000, numberOfSections = 20) {
   return sampledSections.join(" ");
 }
 
+async function updateDocumentStatus(userId, documentId, status) {
+  await db.send(
+    new UpdateCommand({
+      TableName: "Documents",
+      Key: {
+        userId,
+        documentId
+      },
+      UpdateExpression: "SET #status = :status",
+      ExpressionAttributeNames: {
+        "#status": "status"
+      },
+      ExpressionAttributeValues: {
+        ":status": status,
+      }
+    })
+  )
+}
+
 // --- JWT Middleware --- 
 function authenticateToken(req, res, next) {
   const token = req.headers.authorization?.split(" ")[1];
@@ -113,7 +132,7 @@ app.post("/api/generate-exam", authenticateToken, async (req, res) => {
     } else {
       studyMaterial = allText;
     }
-    console.log(studyMaterial); 
+    console.log(studyMaterial);
 
     const result = await model.generateContent(
       prompts.generateExam(studyMaterial, examSettings)
@@ -122,7 +141,7 @@ app.post("/api/generate-exam", authenticateToken, async (req, res) => {
     const exam = result.response.text().replace(/```json\n?|```/g, "").trim();
     res.json(JSON.parse(exam));
 
-    // Begin indexing files in the background so they can be used for RAG 
+    // Begin indexing files in the background so they can be used for RAG
     beginBackgroundIndexing(files, req.user.userId);
 
   } catch (err) {
@@ -339,6 +358,18 @@ app.post('/api/s3-upload-url', authenticateToken, async (req, res) => {
       expiresIn: 60,
     });
 
+    // Save document metadata 
+    await db.send(
+      new PutCommand({
+        TableName: "Documents",
+        Item: {
+          userId: req.user.userId,
+          documentId: key,
+          status: "UPLOADING"
+        }
+      })
+    )
+
     res.json({ uploadUrl, key });
 
   } catch (err) {
@@ -394,6 +425,21 @@ app.post("/api/regenerate-exam", authenticateToken, async (req, res) => {
     res.status(500).json({
       error: "Failed to regenerate exam"
     });
+  }
+});
+
+app.get("/api/get-documents", authenticateToken, async (req, res) => {
+  try {
+    const result = await db.send(new QueryCommand({
+      TableName: 'Documents',
+      KeyConditionExpression: 'userId = :userId',
+      ExpressionAttributeValues: { ':userId': req.user.userId },
+    }));
+
+    res.json(result.Items);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to get documents' });
   }
 });
 
@@ -456,8 +502,10 @@ async function beginBackgroundIndexing(files, userId) {
     try {
       const text = await getTextFromS3File(file.key, file.filetype);
       await indexDocument(file.key, text, userId);
+      await updateDocumentStatus(userId, file.key, "READY")
     } catch (err) {
       console.error(`Indexing failed for ${file.key}:`, err);
+      await updateDocumentStatus(userId, file.key, "FAILED");
     }
   }
 }
@@ -493,6 +541,7 @@ async function indexDocument(s3Key, text, userId) {
     console.log(`Indexed ${Math.min(i + batchSize, chunks.length)}/${chunks.length}`);
     await sleep(10000);
   }
+
 }
 
 async function retrieveRelevantChunks(topics, userId, documentKeys, topKPerTopic = 3) {

@@ -208,3 +208,22 @@ export async function regenerateExam(
 
   return res.json();
 }
+
+export async function getDocuments() {
+  const res = await fetch(`${BASE_URL}/api/get-documents`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${localStorage.getItem("token")}`
+    },
+  })
+  if (!res.ok) {
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+      window.location.href = '/'
+    }
+    const data = await res.json();
+    throw new Error(data.error);
+  }
+  return res.json();
+}
