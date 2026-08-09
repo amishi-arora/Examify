@@ -15,13 +15,14 @@ import cors from 'cors';
 import * as prompts from "./prompts.js";
 import crypto from 'crypto';
 dotenv.config();
-
+import path from "path";
+import { fileURLToPath } from "url";
 
 // --- Constants --- 
 const MC_QUESTION_TYPE = "Multiple Choice"
 const SHORT_QUESTION_TYPE = "Short answer"
-
-// --- AI Setup --- 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite' });
 
@@ -29,6 +30,7 @@ const model = genAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite' });
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "client", "dist")));
 
 // --- Helpers --- 
 async function getTextFromS3File(key, fileType) {
@@ -603,6 +605,11 @@ async function retrieveRelevantChunks(topics, userId, documentKeys, topKPerTopic
     .map(m => m.metadata.text)
     .join('\n\n');
 }
+
+// -- React fallback -- 
+app.get("/{*splat}", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
+});
 
 // --- Start Server ---
 const PORT = process.env.PORT || 3001;
