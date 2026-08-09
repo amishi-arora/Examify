@@ -71,12 +71,12 @@ export default function InsightsCard({ exam, setExamQuestions }) {
         <div className="flex flex-row gap-1">
             {insights.weakTopics?.map(w => <span key={w} className="rounded-xl px-2 bg-red-100 text-red-900 ease hover:scale-102 text-sm">{w}</span>)}
         </div>
-        {insights.weakTopics ? <button onClick={handleRegenerate} disabled={generating || !canRegenerate} className="cursor-pointer bg-blue-500 text-white p-2 rounded-xl hover:bg-blue-600 transition flex items-center justify-center w-full mt-2 disabled:bg-gray-300 disabled:cursor-default" >
+        {insights.weakTopics.length > 0 ? <button onClick={handleRegenerate} disabled={generating || !canRegenerate} className="cursor-pointer bg-blue-500 text-white p-2 rounded-xl hover:bg-blue-600 transition flex items-center justify-center w-full mt-2 disabled:bg-gray-300 disabled:cursor-default" >
             {generating ? <span className="mx-auto animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" /> :
                 buttonText}
         </button> : ""
         }
-        {insights.weakTopics && !canRegenerate && !failed && <p className="text-xs font-light text-center">We're preparing your uploaded documents so you can regenerate questions based on the topics you struggled with</p>}
+        {insights.weakTopics.length > 0 && !canRegenerate && !failed && <p className="text-xs font-light text-center">We're preparing your uploaded documents so you can regenerate questions based on the topics you struggled with</p>}
         {/* Error message in case exam generation fails */}
         {error && <ErrorMessage message={error} />}
     </div >
