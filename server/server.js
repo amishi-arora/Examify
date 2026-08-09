@@ -9,7 +9,6 @@ import jwt from 'jsonwebtoken';
 import db from './db.js';
 import s3 from './s3.js';
 import index from './pinecone.js';
-import * as constants from "../client/src/constants.js";
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import express from 'express';
 import cors from 'cors';
@@ -17,6 +16,10 @@ import * as prompts from "./prompts.js";
 import crypto from 'crypto';
 dotenv.config();
 
+
+// --- Constants --- 
+const MC_QUESTION_TYPE = "Multiple Choice"
+const SHORT_QUESTION_TYPE = "Short answer"
 
 // --- AI Setup --- 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -180,8 +183,8 @@ app.post('/api/grade-exam', authenticateToken, async (req, res) => {
     if (!examQuestions || !studentAnswers) {
       return res.status(400).json({ error: 'Exam questions and answers must be provided' });
     }
-    const mcQuestions = examQuestions.questions.filter(q => q.type === constants.QUESTION_TYPES.MC);
-    const shortQuestions = examQuestions.questions.filter(q => q.type === constants.QUESTION_TYPES.SHORT);
+    const mcQuestions = examQuestions.questions.filter(q => q.type === MC_QUESTION_TYPE);
+    const shortQuestions = examQuestions.questions.filter(q => q.type === SHORT_QUESTION_TYPE);
 
     // Grade MC locally
     for (const q of mcQuestions) {
