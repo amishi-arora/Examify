@@ -19,7 +19,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 // --- Constants --- 
-const MC_QUESTION_TYPE = "Multiple Choice"
+const MC_QUESTION_TYPE = "Multiple choice"
 const SHORT_QUESTION_TYPE = "Short answer"
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
