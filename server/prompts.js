@@ -1,4 +1,5 @@
-import * as constants from "../client/src/constants.js"
+const MC_QUESTION_TYPE = "Multiple Choice"
+const SHORT_QUESTION_TYPE = "Short answer"
 
 export const generateExam = (text, examSettings, focusTopics = null) => `You are an exam generator. Based on the following study material, generate an exam with exactly ${examSettings.multipleChoice} multiple choice questions and ${examSettings.shortAnswer} short answer questions.
 Make the exam of ${examSettings.difficulty} difficulty level. If mixed, distribute questions evenly across easy, medium, and hard. 
@@ -10,14 +11,14 @@ Return ONLY a JSON object in this exact format, no markdown, no backticks, no ex
   "questions": [
     {
       "id": 1,
-      "type": "${constants.QUESTION_TYPES.MC}",
+      "type": "${MC_QUESTION_TYPE}",
       "questionText": "question here",
       "options": ["A. [option text]", "B. [option text]", "C. [option text]", "D. [option text]"],
       "answer": "[the letter and full text of the correct option, e.g. C. some correct answer]"
     },
     {
       "id": 2,
-      "type": "${constants.QUESTION_TYPES.SHORT}",
+      "type": "${SHORT_QUESTION_TYPE}",
       "questionText": "question here",
       "answer": "brief sample correct answer here, only 1-2 lines"
     }
