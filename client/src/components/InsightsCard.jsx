@@ -26,10 +26,9 @@ export default function InsightsCard({ exam, setExamQuestions }) {
                 setDocuments(docs);
 
                 const relevant = docs.filter(doc => exam.documentKeys.includes(doc.documentId));
-                const allSettled = relevant.length > 0 &&
-                    relevant.every(doc => doc.status === "READY" || doc.status === "FAILED");
+                const allSettled = relevant.every(doc => doc.status === "READY" || doc.status === "FAILED");
 
-                if (allSettled && interval) {
+                if (allSettled) {
                     clearInterval(interval);
                 }
             } catch (err) {

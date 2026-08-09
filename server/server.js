@@ -67,7 +67,7 @@ async function extractPdfText(buffer) {
 
 function sampleText(text, maxChars = 300000, numberOfSections = 20) {
   const sectionSize = Math.floor(text.length / numberOfSections);
-  const charsPerSection = maxChars / numberOfSections;
+  const charsPerSection = Math.floor(maxChars / numberOfSections);
 
   const sampledSections = [];
 
@@ -488,22 +488,14 @@ async function generateEmbeddings(chunks) {
 }
 
 async function generateEmbedding(text) {
-  const result = await embeddingModel.batchEmbedContents({
-    requests: [
-      {
-        content: {
-          parts: [
-            {
-              text
-            }
-          ]
-        },
-        taskType: "RETRIEVAL_QUERY"
-      }
-    ]
+  const result = await embeddingModel.embedContent({
+    content: {
+      parts: [{ text }]
+    },
+    taskType: "RETRIEVAL_QUERY"
   });
 
-  return result.embeddings[0].values;
+  return result.embedding.values;
 }
 
 function chunkText(text, chunkSize = 300, overlap = 30) {
@@ -511,10 +503,7 @@ function chunkText(text, chunkSize = 300, overlap = 30) {
   const chunks = [];
   for (let i = 0; i < words.length; i += chunkSize - overlap) {
     const chunk = words.slice(i, i + chunkSize).join(' ');
-    if (chunk.trim()) {
-      chunks.push(chunk);
-    }
-    if (i + chunkSize >= words.length) break;
+    chunks.push(chunk); 
   }
   return chunks;
 }
@@ -530,6 +519,9 @@ async function beginBackgroundIndexing(files, userId) {
       const text = await getTextFromS3File(file.key, file.filetype);
       const contentHash = hashText(text);
 
+      // Known limitation: if the same content is uploaded twice in quick succession 
+      // (before first upload finishes indexing), both will index independently
+      // since findIndexedDocumentByHash only catches READY matches
       const existing = await findIndexedDocumentByHash(userId, contentHash);
       if (existing) {
         console.log(`Skipping ${file.key} — identical content already indexed (hash ${contentHash})`);
