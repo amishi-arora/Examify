@@ -1,4 +1,4 @@
-const MC_QUESTION_TYPE = "Multiple Choice"
+const MC_QUESTION_TYPE = "Multiple choice"
 const SHORT_QUESTION_TYPE = "Short answer"
 
 export const generateExam = (text, examSettings, focusTopics = null) => `You are an exam generator. Based on the following study material, generate an exam with exactly ${examSettings.multipleChoice} multiple choice questions and ${examSettings.shortAnswer} short answer questions.
