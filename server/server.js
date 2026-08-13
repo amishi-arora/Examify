@@ -30,7 +30,7 @@ const model = genAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite' });
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "client", "dist")));
+app.use(express.static(path.join(__dirname, "..", "client", "dist")));
 
 // --- Helpers --- 
 async function getTextFromS3File(key, fileType) {
@@ -608,7 +608,7 @@ async function retrieveRelevantChunks(topics, userId, documentKeys, topKPerTopic
 
 // -- React fallback -- 
 app.get("/{*splat}", (req, res) => {
-  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
+  res.sendFile(path.join(__dirname, "..", "client", "dist", "index.html"));
 });
 
 // --- Start Server ---
