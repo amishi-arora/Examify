@@ -4,6 +4,6 @@
   "private": true,
   "scripts": {
     "start": "npm --prefix server start",
-    "postinstall": "npm --prefix server install"
+    "postinstall": "npm --prefix server install && npm --prefix client install && npm --prefix client run build"
   }
 }
