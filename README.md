@@ -59,16 +59,16 @@ cd ../server
 npm install
 ```
 
-3. Configure the required environment variables and AWS resources
+3. Configure environment variables based on the `.env.example` file
 
-4. Start the backend 
+4. Start the backend:
 
 ```bash
 cd server
 npm start
 ```
 
-5. Start the frontend
+5. Start the frontend:
 ```bash
 cd client
 npm run dev
