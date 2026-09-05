@@ -24,7 +24,7 @@ export const SCORE_COLORS = {
     }
 }
 
-export const BASE_URL = ""
+export const BASE_URL = import.meta.env.VITE_API_URL || ""
 
 export const DEFAULT_EXAM_SETTINGS = {
     difficulty: "Medium",
