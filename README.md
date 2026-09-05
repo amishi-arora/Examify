@@ -59,7 +59,7 @@ cd ../server
 npm install
 ```
 
-3. Configure environment variables based on the `.env.example` file
+3. Configure environment variables based on the `.env.example` files
 
 4. Start the backend:
 
