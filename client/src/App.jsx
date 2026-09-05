@@ -17,14 +17,14 @@ function isTokenValid(token) {
   }
 }
 function App() {
-  const token = localStorage.getItem("token");
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [examQuestions, setExamQuestions] = useState({});
 
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={
-          <SignInPage />
+          <SignInPage setToken = {setToken}/>
         } />
         <Route path="/home" element={isTokenValid(token) ? <HomePage setExamQuestions={setExamQuestions} /> : <Navigate to="/" />} />
         <Route path="/exam" element={isTokenValid(token) && Object.keys(examQuestions).length ?

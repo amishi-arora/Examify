@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { login, register } from "../api.js";
 import ErrorMessage from "./ErrorMessage.jsx";
 
-export default function AuthModal() {
+export default function AuthModal({setToken}) {
     const [loginMode, setLoginMode] = useState(true);
     const [error, setError] = useState(null)
     const [loggingIn, setLoggingIn] = useState(false);
@@ -19,6 +19,7 @@ export default function AuthModal() {
                 const { token, name } = await login(fd.get("email"), fd.get("password"));
                 localStorage.setItem("token", token);
                 localStorage.setItem("name", name);
+                setToken(token); 
             } else {
                 if (fd.get("password") !== fd.get("confirmPassword")) {
                     setError("Passwords do not match");
@@ -27,6 +28,7 @@ export default function AuthModal() {
                 const { token, name } = await register(fd.get("name"), fd.get("email"), fd.get("password"));
                 localStorage.setItem("token", token);
                 localStorage.setItem("name", name);
+                setToken(token); 
             }
             navigate("/home");
         } catch (err) {
