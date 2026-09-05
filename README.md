@@ -50,9 +50,15 @@ git clone https://github.com/amishi-arora/Examify.git
 cd Examify
 ```
 2. Install dependencies:
-```bash
+```bash 
+cd client
 npm install
 ```
+```bash
+cd ../server
+npm install
+```
+
 3. Configure the required environment variables and AWS resources
 
 4. Start the backend 
