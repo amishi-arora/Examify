@@ -1,7 +1,8 @@
 # Examify
 
 > AI-powered study platform that turns your study materials into personalized practice exams.
-
+[🚀 Live Demo](http://examify.us-east-2.elasticbeanstalk.com/)
+> 
 ## 📖 Overview
 
 Examify helps students turn their study materials into personalized practice exams. Users can upload multiple documents, customize exam settings, and receive AI-generated grading and feedback. 
