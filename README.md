@@ -64,14 +64,14 @@ npm install
 4. Start the backend 
 
 ```bash
-cd backend
+cd server
 npm start
 ```
 
 5. Start the frontend
 ```bash
-cd frontend
-npm start
+cd client
+npm run dev
 ```
 
 
