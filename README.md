@@ -44,19 +44,30 @@ Based on performance insights, students can regenerate exams focused on their we
 
 ### Installation
 
-Clone the repository:
+1. Clone the repository:
 ```bash
 git clone https://github.com/amishi-arora/Examify.git
 cd Examify
 ```
-Install dependencies:
+2. Install dependencies:
 ```bash
 npm install
 ```
-Configure the required environment variables and AWS resources, then start the application
-```
+3. Configure the required environment variables and AWS resources
+
+4. Start the backend 
+
+```bash
+cd backend
 npm start
-``` 
+```
+
+5. Start the frontend
+```bash
+cd frontend
+npm start
+```
+
 
 ## 📌 Future Improvements
 
